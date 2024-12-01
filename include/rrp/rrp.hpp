@@ -1,15 +1,17 @@
 #pragma once
 
 #include "reflect"
+#include <exception>
 #include <type_traits>
 #include "fast_float.h"
+#include <concepts>
+#include <iostream>
 
 #ifndef RRP_STRING_TYPE
 #include <string>
 #define RRP_STRING_TYPE std::string
 #endif
 
-#include "static_string/static_string.h"
 
 #ifndef RRP_STRING_VIEW_TYPE
 #include <string_view>
@@ -43,7 +45,7 @@ using string_view = RRP_STRING_VIEW_TYPE;
 
 
 template<typename T>
-constexpr T fromString(rrp::string_view str)
+rrp::optional<T> fromString(rrp::string_view str)
 {
 	if constexpr (std::is_same_v<T, bool>)
 	{
@@ -52,14 +54,13 @@ constexpr T fromString(rrp::string_view str)
 	else
 	{
 		T value;
-		if constexpr (fast_float::from_chars(str.data(), str.data() + str.size(), value).ec == std::errc())
+		if (fast_float::from_chars(str.data(), str.data() + str.size(), value).ec == std::errc())
 		{
 			return value;
 		}
 	}
 	return {};
 }
-
 
 
 struct Response
@@ -71,43 +72,20 @@ struct Response
 };
 
 
-template<typename T>
-constexpr Response rrp(std::string_view str)
+// Define a concept that matches numerical types but excludes char
+inline rrp::vector<rrp::string_view> splitByDelimStringView(std::string_view str, std::string_view delim)
 {
-    if constexpr(T::DELIM.empty())
-    {
-        return {};
-    }
 
-    Response r;
-
-    constexpr auto splitted = splitByDelimStringView(str, T::DELIM);
-
-    auto it = splitted.begin();
-
-    reflect::for_each([&](auto I)
-    {
-        reflect::get<I>(r) = fromString<std::remove_reference_t<decltype(reflect::get<I>(r))>>(*it);
-        ++it;
-    }, r);
-
-    return r;
-}
-
-
-template<cts::static_string str, cts::static_string delim>
-constexpr inline rrp::vector<rrp::string_view> splitByDelimStringView()
-{
-	constexpr rrp::vector<rrp::string_view> tokens;
+	rrp::vector<rrp::string_view> tokens;
 	size_t pos = 0;
 	size_t len = str.length();
 
 	while (pos < len)
 	{
-		constexpr size_t end = str.find(delim, pos);
-		if constexpr(end == std::string_view::npos)
+		size_t end = str.find(delim, pos);
+		if(end == std::string_view::npos)
 		{
-			tokens.emplace_back(strsubstr(pos));
+			tokens.emplace_back(str.substr(pos));
 			break;
 		}
 		tokens.emplace_back(str.substr(pos, end - pos));
@@ -117,44 +95,60 @@ constexpr inline rrp::vector<rrp::string_view> splitByDelimStringView()
 	return tokens;
 }
 
-constexpr std::size_t upper_bound_for_make_vector(const auto str, const auto delim)
-{
-    std::size_t count = 1;
-    std::size_t pos = 0;
+// Define a concept that matches numerical types but excludes char
+template <typename T>
+concept is_numerical_generic = std::is_arithmetic_v<T> && !std::is_same_v<T, char>;
 
-    pos = str.template find<0, delim.m_elems>(delim);
-    while (pos != std::string_view::npos) {
-        ++count;
-        pos = str.template find<pos + delim.size()>(delim);
+template <typename T>
+concept has_non_empty_delim = requires {
+    { T::DELIM } -> std::convertible_to<std::string_view>;
+} && (!T::DELIM.empty());
+
+
+template<typename T>
+concept other = std::constructible_from<T, rrp::string_view>;
+
+
+template<typename T>
+T rrp(std::string_view str)
+{
+    static_assert(has_non_empty_delim<T>, "Type needs to have a non empty static constexpr std::string_view DELIM member");
+
+    if constexpr(T::DELIM.empty())
+    {
+        return {};
     }
 
-    return count;
+    T r;
+
+    auto splitted = splitByDelimStringView(str, T::DELIM);
+
+    auto it = splitted.begin();
+
+    reflect::for_each([&](auto I)
+    {
+        using MemberType = std::remove_reference_t<decltype(reflect::get<I>(r))>;
+        if constexpr(is_numerical_generic<MemberType>)
+        {
+            auto opt = fromString<MemberType>(*it);
+            if(opt) reflect::get<I>(r) = *opt;
+        }
+        else if constexpr(has_non_empty_delim<MemberType>)
+        {
+            reflect::get<I>(r) = rrp<MemberType>(*it);
+        }
+        else if constexpr(std::constructible_from<MemberType, rrp::string_view>)
+        {
+            reflect::get<I>(r) = MemberType(*it);
+        }
+
+        ++it;
+        
+    }, r);
+
+    return r;
 }
 
 
-constexpr inline auto splitByDelimStringViewArray(auto str, auto delim)
-{
-    const auto vec = splitByDelimStringView<str, delim>();
-    std::array<std::string_view, upper_bound_for_make_vector<str, delim>()> tokens; 
-    tokens[0] = vec[0];
-
-
-    return tokens;
-    
-}
-
-constexpr void test()
-{
-    constexpr cts::static_string a = "1,2,3";
-    constexpr cts::static_string b = ",";
-
-    auto c = upper_bound_for_make_vector(a, b);
-
-    constexpr auto x = splitByDelimStringViewArray<"1,2,3", ",">();
-
-    static_assert(std::get<0>(x) == rrp::string_view{"1"});
-
-
-}
 
 }
