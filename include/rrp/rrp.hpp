@@ -123,16 +123,16 @@ struct ValueMapContainer
     template<typename T>
     static T parse(std::string_view str)
     {
-        myprint("\n");
-        myprint(str);
+        //myprint("\n");
+        //myprint(str);
         T ret;
         auto tokens = splitByDelimToMap(str, T::DELIM);
-        myprint(tokens.size());
-        for(const auto& k : tokens)
-        {
-            std::string x = std::to_string(k.first) + ":" + std::string(k.second);
-            myprint(x);
-        }
+        //myprint(tokens.size());
+        //for(const auto& k : tokens)
+        //{
+        //    std::string x = std::to_string(k.first) + ":" + std::string(k.second);
+        //    myprint(x);
+        //}
         reflect::for_each([&](auto I){
             using M = std::remove_reference_t<decltype(reflect::get<I>(ret))>;
             auto&& member = reflect::get<I>(ret);
@@ -149,7 +149,7 @@ struct ValueMapContainer
 };
 
 #define RRP_IVM_W_GETTER(T, index, name) \
-    IndexedValueMap<T, index> m_##name; \
+    rrp::IndexedValueMap<T, index> m_##name; \
     T& name() { return m_##name.value; }
 
 
@@ -164,7 +164,7 @@ concept has_non_empty_delim = requires {!T::DELIM.size() != 0;};
 
 
 #define RRP_DBC_W_GETTER(T, delim, name) \
-    DelimBasedContainer<T, delim> m_##name; \
+    rrp::DelimBasedContainer<T, delim> m_##name; \
     std::vector<T>& name() { return m_##name.values ;}
 
 
@@ -179,13 +179,13 @@ struct DelimBasedContainer : DelimBasedContainerBase
 
     //level1,level2,
     //where level: 0:1:2:name:3:desc
+    template<typename U>
     static auto parse(std::string_view str)
     {
         
-        DelimBasedContainer<T, D> ret;
-        if constexpr(has_non_empty_delim<T>)
+        U ret;
+        if constexpr(has_non_empty_delim<U>)
         {
-            myprint(str);
             auto tokens = splitByDelimStringView(str, DELIM);
             for(const auto& t : tokens)
             {
@@ -196,27 +196,51 @@ struct DelimBasedContainer : DelimBasedContainerBase
     }
 };
 
-template<typename T>
-bool is_indexed_value_map_only()
+struct SimpleDelimSeparatedBase
 {
-    bool ret = true;
-    reflect::for_each<T>([&](auto I){
-        if (reflect::type_name(reflect::get<I>(std::declval<T>())) != "IndexedValueMap")
-        {
-            ret = false;
-            return;
-        }
-    });
+    template<typename T>
+    static T parse(std::string_view str)
+    {
+        myprint("AAAAAAAAAAAAAAAA");
+        T ret;
+        auto tokens = splitByDelimStringView(str, T::DELIM);
+        myprint(tokens[0]);
+        reflect::for_each([&](auto I){
+            auto&& member = reflect::get<I>(ret);
+            using M = std::remove_reference_t<decltype(member)>;
+            if(auto opt = fromString<M>(tokens[I]))
+            {
+                member = *opt;
+            }
+        }, ret);
 
-    return ret;
+        return ret;
+    }
+};
+
+template<typename T>
+concept Parsable = requires(T t, std::string_view str) {
+    // Check if T::parse<T>(str) is valid where parse returns T
+    { T::template parse<T>(str) } -> std::same_as<T>;
+};
+
+
+template<typename T>
+constexpr bool is_base_supported()
+{
+    return std::is_base_of_v<DelimBasedContainerBase, T>
+    || std::is_base_of_v<ValueMapContainer, T>;
 }
-
-
 
 template<typename T>
 T rrp(std::string_view str)
 {
     T ret;
+    if constexpr(Parsable<T>)
+    {
+        return T::template parse<T>(str);
+    }
+
     auto tokens = splitByDelimStringView(str, T::DELIM);
     auto it = tokens.begin();
     reflect::for_each([&](auto I)
@@ -225,17 +249,14 @@ T rrp(std::string_view str)
 
         using M = std::remove_reference_t<decltype(reflect::get<I>(ret))>;
         auto&& member = reflect::get<I>(ret);
-        auto&& member_name = reflect::type_name(member);
-        if constexpr(std::is_base_of_v<DelimBasedContainerBase, M>)
-        {
-            std::cout << "HELLO";
-            member = M::parse(*it);
-            ++it;
-        }
-        else if constexpr(std::is_base_of_v<ValueMapContainer, M>)
+        myprint(reflect::type_name<M>());
+        if constexpr(Parsable<M>)
         {
             member = M::template parse<M>(*it);
             ++it;
+        }
+        else
+        {
         }
     }, ret);
 
@@ -244,76 +265,18 @@ T rrp(std::string_view str)
 
 
 
-template<reflect::fixed_string D = "">
-struct LevelObject : public ValueMapContainer
-{
-    static constexpr reflect::fixed_string DELIM = D;
 
-    // Integer getters
-    RRP_IVM_W_GETTER(int, 1, levelID);
-    RRP_IVM_W_GETTER(int, 5, version);
-    RRP_IVM_W_GETTER(int, 6, playerID);
-    RRP_IVM_W_GETTER(int, 8, difficultyDenominator);
-    RRP_IVM_W_GETTER(int, 9, difficultyNumerator);
-    RRP_IVM_W_GETTER(int, 10, downloads);
-    RRP_IVM_W_GETTER(int, 11, setCompletes); // Note: Removed in update 2.1
-    RRP_IVM_W_GETTER(int, 12, officialSong);
-    RRP_IVM_W_GETTER(int, 13, gameVersion);
-    RRP_IVM_W_GETTER(int, 14, likes);
-    RRP_IVM_W_GETTER(int, 15, length);
-    RRP_IVM_W_GETTER(int, 16, dislikes);
-    RRP_IVM_W_GETTER(int, 18, stars);
-    RRP_IVM_W_GETTER(int, 19, featureScore);
-    RRP_IVM_W_GETTER(int, 30, copiedID);
-    RRP_IVM_W_GETTER(int, 35, customSongID);
-    RRP_IVM_W_GETTER(int, 37, coins);
-    RRP_IVM_W_GETTER(int, 39, starsRequested);
-    RRP_IVM_W_GETTER(int, 41, dailyNumber); // Note: Specific to daily/weekly levels
-    RRP_IVM_W_GETTER(int, 42, epic);
-    RRP_IVM_W_GETTER(int, 43, demonDifficulty);
-    RRP_IVM_W_GETTER(int, 45, objects);
-    RRP_IVM_W_GETTER(int, 46, editorTime);
-    RRP_IVM_W_GETTER(int, 47, editorTimeCopies);
-    RRP_IVM_W_GETTER(int, 54, unknown);
-    RRP_IVM_W_GETTER(int, 57, verificationTime);
 
-    // Bool getters
-    RRP_IVM_W_GETTER(bool, 17, demon);
-    RRP_IVM_W_GETTER(bool, 25, auto_);
-    RRP_IVM_W_GETTER(bool, 31, twoPlayer);
-    RRP_IVM_W_GETTER(bool, 38, verifiedCoins);
-    RRP_IVM_W_GETTER(bool, 40, lowDetailMode);
-    RRP_IVM_W_GETTER(bool, 44, isGauntlet);
 
-    // String getters
-    RRP_IVM_W_GETTER(std::string, 2, levelName);
-    RRP_IVM_W_GETTER(std::string, 3, description);
-    RRP_IVM_W_GETTER(std::string, 4, levelString);
-    RRP_IVM_W_GETTER(std::string, 26, recordString); // Note: Unused
-    RRP_IVM_W_GETTER(std::string, 28, uploadDate);
-    RRP_IVM_W_GETTER(std::string, 29, updateDate);
-    RRP_IVM_W_GETTER(std::string, 36, extraString);
-    RRP_IVM_W_GETTER(std::string, 48, settingsString); // Note: Unused after early 2.1
+//TODO
 
-    // Encrypted String getters
-    RRP_IVM_W_GETTER(std::string, 27, password);
-
-    // Comma-Separated List getters
-    RRP_IVM_W_GETTER(std::string, 52, songIDs);
-    RRP_IVM_W_GETTER(std::string, 53, sfxIDs);
-};
-
+/*
+struct UserObject {};
 template<reflect::fixed_string D>
-struct CreatorObject
+struct GetGJScores20
 {
-    static reflect::fixed_string DELIM = D;
-    //TODO simple comma separated values 
+    
+    std::vector<UserObject> objects;
 };
-
-struct GJLevels21
-{
-    static constexpr reflect::fixed_string DELIM = "#";
-    RRP_DBC_W_GETTER(LevelObject<":">, "|", levels);
-};
-
+*/
 }
