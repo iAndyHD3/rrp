@@ -17,15 +17,3 @@ if(PROJECT_IS_TOP_LEVEL)
 
 add_subdirectory(test)
 endif()
-
-
-include(FetchContent)
-FetchContent_Declare(
-  PEGTL
-  GIT_SHALLOW    TRUE
-  GIT_REPOSITORY https://github.com/taocpp/PEGTL
-  GIT_TAG        d7b821b1e5ed6ab321625f50427c4ae0b78909d5
-)
-FetchContent_MakeAvailable(PEGTL)
-
-target_link_libraries(rrp PUBLIC pegtl)
