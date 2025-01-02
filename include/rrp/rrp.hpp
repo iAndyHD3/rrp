@@ -19,12 +19,27 @@ inline void myprint(auto a, std::source_location x = std::source_location::curre
 }
 
 template<typename T>
+concept Parsable = requires(T t, std::string_view str) {
+    // Check if T::parse<T>(str) is valid where parse returns T
+    { T::template parse<T>(str) } -> std::same_as<T>;
+};
+
+template<typename T>
+concept BasicTypeOrString = std::integral<T> || std::floating_point<T> || std::same_as<T, bool> || 
+                            std::same_as<T, std::string> || std::same_as<T, std::string_view>;
+
+template<BasicTypeOrString T>
 std::optional<T> fromString(std::string_view str)
 {
     if constexpr (std::is_same_v<T, std::string>)
     {
         return std::string(str);
     }
+    else if constexpr (std::is_same_v<T, std::string_view>)
+    {
+        return str;
+    }
+
     else if constexpr (std::is_same_v<T, bool>)
 	{
 		return str == "1" || str == "true";
@@ -104,15 +119,16 @@ struct IndexedValueMap
     T value{};
     operator T() { return value; }
     T* operator->() { return value; }
-    auto operator<=>(const T& rhs) const {
-        return value <=> rhs;
-    }
 
     constexpr static int KEY = index;
     static auto parse(std::string_view str)
     {
         IndexedValueMap<T, index> ret;
-        if(auto v = fromString<T>(str)) ret.value = *v;
+        if constexpr(Parsable<T>)
+        {
+            ret.value = T::template parse<T>(str);
+        }
+        else if(auto v = fromString<T>(str)) ret.value = *v;
         return ret;
     }
 };
@@ -138,10 +154,7 @@ struct ValueMapContainer
             auto&& member = reflect::get<I>(ret);
             if(auto value_it = tokens.find(M::KEY); value_it != tokens.end())
             {
-                if(auto v2_parsed = fromString<typename M::type>(value_it->second))
-                {
-                    member.value = *v2_parsed;
-                }
+                member = M::parse(value_it->second);
             }
         }, ret);
         return ret;
@@ -167,12 +180,13 @@ concept has_non_empty_delim = requires {!T::DELIM.size() != 0;};
     rrp::DelimBasedContainer<T, delim> m_##name; \
     std::vector<T>& name() { return m_##name.values ;}
 
-
+#define RRP_DELIM(D) static constexpr reflect::fixed_string DELIM = D
 
 struct DelimBasedContainerBase {};
 template<typename T, reflect::fixed_string D>
 struct DelimBasedContainer : DelimBasedContainerBase
 {
+    using value = T;
     static constexpr reflect::fixed_string DELIM = D;
     std::vector<T> values;
     operator std::vector<T>() { return values; }
@@ -184,31 +198,37 @@ struct DelimBasedContainer : DelimBasedContainerBase
     {
         
         U ret;
-        if constexpr(has_non_empty_delim<U>)
+        auto tokens = splitByDelimStringView(str, U::DELIM);
+        if constexpr(Parsable<T>)
         {
-            auto tokens = splitByDelimStringView(str, DELIM);
-            for(const auto& t : tokens)
-            {
-                ret.values.push_back(T::template parse<T>(t));
-            }
+            for(const auto& t : tokens) ret.values.push_back(T::template parse<T>(t));
         }
+        else
+        {
+            for(const auto& t : tokens) if(auto v = fromString<T>(t)) ret.values.push_back(*v);
+        }
+        
         return ret;
     }
 };
+
+
 
 struct SimpleDelimSeparatedBase
 {
     template<typename T>
     static T parse(std::string_view str)
     {
-        myprint("AAAAAAAAAAAAAAAA");
         T ret;
         auto tokens = splitByDelimStringView(str, T::DELIM);
-        myprint(tokens[0]);
         reflect::for_each([&](auto I){
             auto&& member = reflect::get<I>(ret);
             using M = std::remove_reference_t<decltype(member)>;
-            if(auto opt = fromString<M>(tokens[I]))
+            if constexpr(Parsable<M>)
+            {
+                member = M::template parse<M>(str);
+            }
+            else if(auto opt = fromString<M>(tokens[I]))
             {
                 member = *opt;
             }
@@ -218,19 +238,8 @@ struct SimpleDelimSeparatedBase
     }
 };
 
-template<typename T>
-concept Parsable = requires(T t, std::string_view str) {
-    // Check if T::parse<T>(str) is valid where parse returns T
-    { T::template parse<T>(str) } -> std::same_as<T>;
-};
 
 
-template<typename T>
-constexpr bool is_base_supported()
-{
-    return std::is_base_of_v<DelimBasedContainerBase, T>
-    || std::is_base_of_v<ValueMapContainer, T>;
-}
 
 template<typename T>
 T rrp(std::string_view str)
@@ -240,6 +249,13 @@ T rrp(std::string_view str)
     {
         return T::template parse<T>(str);
     }
+    else if constexpr(reflect::size<T>() == 1)
+    {
+        using M = std::remove_reference_t<decltype(reflect::get<0>(ret))>;
+        reflect::get<0>(ret) = rrp::rrp<M>(str);
+        return ret;
+    }
+
 
     auto tokens = splitByDelimStringView(str, T::DELIM);
     auto it = tokens.begin();
@@ -249,14 +265,19 @@ T rrp(std::string_view str)
 
         using M = std::remove_reference_t<decltype(reflect::get<I>(ret))>;
         auto&& member = reflect::get<I>(ret);
-        myprint(reflect::type_name<M>());
+        //myprint(reflect::type_name<M>());
         if constexpr(Parsable<M>)
         {
             member = M::template parse<M>(*it);
             ++it;
         }
-        else
+        else if constexpr(BasicTypeOrString<M>)
         {
+            if(auto v = fromString<M>(*it))
+            {
+                member = *v;
+            }
+            ++it;
         }
     }, ret);
 
