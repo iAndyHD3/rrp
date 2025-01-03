@@ -1,6 +1,8 @@
 #pragma once
 #include "common.hpp"
 
+namespace rrp::v22
+{
 struct GetGJLevels21
 {
 
@@ -12,4 +14,4 @@ struct GetGJLevels21
     rrp::v22::PageInfo pageInfo;
     std::string hash;
 };
-
+}
