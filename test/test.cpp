@@ -1,3 +1,4 @@
+#include <glaze/json/json_t.hpp>
 #include <rrp/2.2/GetLevels21.hpp>
 #include <rrp/2.2/getGJLevelLists.hpp>
 #include <rrp/2.2/getGJGauntlets21.hpp>
@@ -8,8 +9,13 @@
 #include <rrp/2.2/getGJScores20.hpp>
 #include <rrp/2.2/getGJMapPacks21.hpp>
 
+#include "rrp/2.2/common.hpp"
 #include "rrp/base64.h"
+#include "rrp/rrp.hpp"
 #include "ut.hpp"
+
+#include <glaze/glaze.hpp>
+#include <rrp/rrp_glaze.hpp>
 
 using namespace rrp;
 using namespace boost::ut;
@@ -20,8 +26,16 @@ void printid(auto& ptr)
 }
 
 
+void test_glaze()
+{
+    v22::LevelObject a{};
+    std::cout << glz::write<glz::opts{.prettify = true}>(a).value_or("glaze error") << "\n";
+}
+
 int main()
 {
+    test_glaze();
+
     static_assert(!Parsable<rrp::v22::GetGJLevels21>);
     static_assert(!Parsable<std::string>);
     static_assert(!Parsable<int>);
