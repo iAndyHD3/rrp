@@ -226,7 +226,7 @@ struct SimpleDelimSeparatedBase
             using M = std::remove_reference_t<decltype(member)>;
             if constexpr(Parsable<M>)
             {
-                member = M::template parse<M>(str);
+                member = M::template parse<M>(tokens[I]);
             }
             else if(auto opt = fromString<M>(tokens[I]))
             {

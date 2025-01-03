@@ -4,7 +4,9 @@
 #include <rrp/2.2/getGJUserInfo20.hpp>
 #include <rrp/2.2/getGJDailyLevel.hpp>
 #include <rrp/2.2/downloadGJLevel22.hpp>
+#include <rrp/2.2/getGJRewards.hpp>
 
+#include "rrp/base64.h"
 #include "ut.hpp"
 
 using namespace rrp;
@@ -162,6 +164,14 @@ int main()
         expect(r.level.levelString() == "H4sIAAAAAAAAC6WXUZLkIAiGL5StEgWV2qc5wxzAA8wV9vDbielEvumprtp9if3_AiIi0l-fpW8yNI08JNsoI5sNkTnkOUyyDkkpjTZkiO2fPtLoQ_7IOLRTfqst_6qt45dME_7SxC4zFd65kMeu-n829KX-Hr6nfnq3DfvRjfTeidtM_cHM9vUhZUv7YHOoc9Dt8Z2_22TOoe_DZ_ED5eM7DRwTH3p856ykOciWfssmW95yt61sYicsEqEGqCXCGqEHaPmCfYcWZ3uYrRJhXLe2AFuKMHrVbq8eE3nrhx_5CV0C3A804Iz5gnm9zdUdW4yYtBhQ6ZjvcWvZDRgHknAiSYEbDjABF-AaIl3EI84ZOPpXmDDMmCVlDn3FestJHwEt8_jyU79jvY71HOs51vMWsKYEjBxOS7r4QRwBqReWDGxPfOhL9E8L7BdckhJviWqMt6oBx4uiJsC4ohbzQWsChn8d8XLEywswLz1ufcrAuPcpxstEgBU4-mfFgGN8zCrw4l_ZiXYs-FhlL7NXNTq0NFkkSiOhJATE436AMBL5JhC8iRX4cqLi8td5-RX4drLOanAbOKtBuokZrnITTiLFfZ7Evc_T6HfCsMpKOIiz7BQQq4S9JJa9nKWJxOLYWawSiGVzs3ytRHspsdpoIOYzuagoQ6j1pcQ3GytRSTg2pzw5YwiNIZyv8ErwGM5nu0BlIWZBX2ycFX6RUEooJRolGiTmm79INOZYY46dbUKBykow-RvTsjGmnTHtjGlnCPsawryI-N3QxKLaUqwLTTKwAcei2rIAKzAaqsKOKhb9VipwbBqawj-Ffwr_0DQ1PGLNYtFvNQGz5UP8KuLX4J9jvw57jv163G_HI9fxyPXlkTt70NhF9hKb0q4a8XzFblx7xB32HE1uuuzt_jiaOEcT52jiHH2_l5gvrgk45ouj6XON8XOL8XP8OXCDfxX-4f-B15gv3hIw_GsxX7zFfPEO_66m9C_bF5V-dQ8AAA==");
         expect(r.hash1 == "30c4a15cfeb12f97de69d6bd0cc9478794e6c6c4");
         expect(r.hash2 == "48e36e24b267df00a9c87aed127b4a9f020ac9c1");
+    };
+    "getGJRewards.php"_test = [](){
+        auto r = rrp::rrp<v22::getGJRewards>("rEwZGeWpJfEMPDQUOAgIPAQIKBg4DCAAPX1deVFNfV14fDQFSDR9UWAdcH1NfV14fU19XXlFRDgMJBwRbCwkEDQEJDQIPCQsMAhkNHQgeBQMADgsBAwECAAAJHQkAGQgdCAgADwcCAg==|745d883ead4fc5888e3b7cac1fbfcdc72a85e2d5");
+        //LSxDq:4460760:837202:ffffffff-88c5-aa6d-ffff-ffffcd72151b:1688850:0:40,4,0,0:1694:0:250,12,1,0:566:0 | C:/Users/User/Desktop/projects/cpp/rrp/include\rrp/2.2/getGJRewards.hpp:40
+        expect(r.data.randomString == "LSxDq");
+        expect(r.data.userID == 4460760_i);
+        expect(r.data.smallChestReward.orbs == 40_i);
+        expect(r.data.smallChestReward.diamonds == 4_i);
     };
 
 }
