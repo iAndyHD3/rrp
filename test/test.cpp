@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <glaze/json/json_t.hpp>
 #include <rrp/2.2/GetLevels21.hpp>
 #include <rrp/2.2/getGJLevelLists.hpp>
@@ -10,7 +11,6 @@
 #include <rrp/2.2/getGJMapPacks21.hpp>
 
 #include "rrp/2.2/common.hpp"
-#include "rrp/base64.h"
 #include "rrp/rrp.hpp"
 #include "ut.hpp"
 
@@ -25,16 +25,25 @@ void printid(auto& ptr)
     std::cout << ptr.levelID() << "\n";
 }
 
+int fileCount = 0;
 
-void test_glaze()
+void log_glaze(const auto& response)
 {
-    v22::LevelObject a{};
-    std::cout << glz::write<glz::opts{.prettify = true}>(a).value_or("glaze error") << "\n";
+    std::string buffer = glz::write<glz::opts{.prettify = true}>(response).value_or("glaze error");
+    std::cout
+        << buffer
+        << "\n------------------------\n";
+
+    std::filesystem::path x = std::filesystem::temp_directory_path();
+    std::filesystem::path file = x / std::string("rrp-test-" + std::to_string(fileCount) + ".json");
+    std::ofstream f(file);
+    f << buffer;
+    std::cout << "SAVED TO: " << file.string() << std::endl;
+    fileCount = fileCount + 1;
 }
 
 int main()
 {
-    test_glaze();
 
     static_assert(!Parsable<rrp::v22::GetGJLevels21>);
     static_assert(!Parsable<std::string>);
@@ -53,6 +62,9 @@ int main()
     "getGJLevels21.php"_test = [](){
         auto r = rrp::rrp<rrp::v22::GetGJLevels21>("1:10565740:2:Bloodbath:5:3:6:503085:8:10:9:50:10:90849443:12:0:13:21:14:4285711:17:1:43:6:25::18:10:19:10330:42:0:45:24746:3:V2hvc2UgYmxvb2Qgd2lsbCBiZSBzcGlsdCBpbiB0aGUgQmxvb2RiYXRoPyBXaG8gd2lsbCB0aGUgdmljdG9ycyBiZT8gSG93IG1hbnkgd2lsbCBzdXJ2aXZlPyBHb29kIGx1Y2suLi4=:15:3:30:7679228:31:0:37:0:38:0:39:0:46:1:47:2:35:467339|1:21761387:2:Bloodbath Z:5:1:6:3277407:8:10:9:20:10:10030910:12:0:13:20:14:334046:17:1:43:4:25::18:10:19:17840:42:0:45:0:3:UmVtYWtlIG9mIEJCLCBidXQgU2hvcnRlciBhbmQgbXVjaCBlYXNpZXIgWEQgTW9yZSBvZiBhIGdhbWVwbGF5IGxldmVsISAgSnVzdCBhIGZ1biBlYXN5IGRlbW9uLiBWZXJpZmllZCBCeSBYaW9kYXplciEgRW5qb3kgOkQ=:15:3:30:0:31:0:37:3:38:1:39:10:46:1:47:2:35:223469|1:64968478:2:Bloodbath but no:5:1:6:19747356:8:10:9:50:10:2778887:12:0:13:21:14:171471:17::43:6:25::18:8:19:24992:42:0:45:23233:3:Qmxvb2RiYXRoLCBJdCdzIG5vdCBldmVuIHRoaXM=:15:3:30:0:31:0:37:0:38:1:39:8:46:1:47:2:35:706340|1:75795864:2:Bloodbath:5:3:6:12348083:8:10:9:40:10:473190:12:0:13:22:14:14499:17::43:5:25::18:7:19:25025:42:0:45:55985:3:VGhhbmtzIHRvIGV2ZXJ5b25lIGluIG15IGRpc2NvcmQgc2VydmVyIHRoYXQgY29udHJpYnV0ZWQ=:15:3:30:75393195:31:0:37:0:38:1:39:6:46:1:47:2:35:513064#503085:Riot:37415|3277407:Zyzyx:88354|12348083:KNOEPPEL:3009121|19747356:Texic:6152129#1~|~223469~|~2~|~ParagonX9 - HyperioxX~|~3~|~31~|~4~|~ParagonX9~|~5~|~3.77~|~6~|~~|~10~|~http%3A%2F%2Faudio.ngfiles.com%2F223000%2F223469_ParagonX9___HyperioxX.mp3~|~7~|~~|~8~|~1~:~1~|~467339~|~2~|~At the Speed of Light~|~3~|~52~|~4~|~Dimrain47~|~5~|~9.56~|~6~|~~|~10~|~https%3A%2F%2Fgeometrydashcontent.b-cdn.net%2Fsongs%2F467339.mp3~|~7~|~~|~8~|~1~:~1~|~513064~|~2~|~EnV - Uprise~|~3~|~149~|~4~|~Envy~|~5~|~8.71~|~6~|~~|~10~|~http%3A%2F%2Faudio.ngfiles.com%2F513000%2F513064_EnV---Uprise.mp3~|~7~|~UCaRqE7rKwJl1BvMRU4FFVJQ~|~8~|~1~:~1~|~706340~|~2~|~-At the Speed of Light- (8 bit Remix)~|~3~|~46724~|~4~|~ThaPredator~|~5~|~4.78~|~6~|~~|~10~|~http%3A%2F%2Faudio.ngfiles.com%2F706000%2F706340_-At-the-Speed-of-Light--8-.mp3~|~7~|~~|~8~|~1#4:0:10#1664b8bb919b0822a4408752c37a9fb5f651f813");
     
+        log_glaze(r);
+
+
         "bloodbath"_test = [&](){
             expect(r.levels()[0].levelID() == 10565740_i);
             expect(r.levels()[0].levelName() == "Bloodbath");
@@ -99,6 +111,8 @@ int main()
 
     "getGJLevelLists.php"_test = [](){
         auto r = rrp::rrp<GetLevelLists>("1:10834:2:my mcdonalds order:3:aSB3YWxrZWQgdG8gbWNkb25hbGRz:5:1:49:6061424:50:tricipital:10:237406:7:10:14:7845:19::51:78111123,80840474,20556675,71480069,51008389,26108947,59604964,190626,53898587,72443435,47499900,89638158,43758774,90640638,96282081,86742812:55:0:56:0:28:1703082168:29:0|1:4406:2:my mcdonalds order:3:aW0gYXQgdGhlIGRyaXZlIHRocnUgLy8gcGFydCAyIG91dCBub3cgYXQgNzIxMTQ=:5:7:49:17062290:50:GD2G:10:112863:7:2:14:4785:19::51:25147297,82785965,11171792,30261946,31496121,71189946,19716898,14456417,4050125,79412478,1442329,67287373,61350256:55:0:56:0:28:1703048969:29:1703631457|1:22325:2:My McDonalds Order:3:YmFuZ2VyIGxpc3QgaWNs:5:1:49:10722530:50:Jexamania:10:12774:7:9:14:275:19::51:25147297,83671207,46104803,72867858,65500565,16683338,32666588,25717922,84904479,92727112,69043485,4846999,58038680,67287373:55:0:56:0:28:1703125026:29:0|1:72114:2:my mcdonalds order 2:3:aSB0aGluayBoZSBsaWVkIGFib3V0IHRoZSBtYWNoaW5lIGJlaW5nIGJyb2tlbiAvLyB0aGUgc2VxdWVsIG5vIG9uZSBhc2tlZCBmb3IgdG8gbXkgbWNkb25hbGRzIG9yZGVy:5:3:49:17062290:50:GD2G:10:6990:7:2:14:189:19::51:25147297,65037091,88758014,59604964,67993675,59966737,56102262,97933043,2056444,85312317,91482208,58038680,46160451,75940156,95959832,81466909,68064189,61350256:55:0:56:0:28:1703631267:29:1703638822|1:16619:2:my mcdonalds order:3:SSBLTk9XIElUJ1MgQkFELCBUSEVSRSBXRVJFTidUIE1BTlkgT1BUSU9OUyE=:5:1:49:14542509:50:ZohMyGoodnessGD:10:3935:7:6:14:53:19::51:47499900,57410100,57474996,84904479,38557238,59157328,87981410,60001202,77367261,41551990,67287373:55:0:56:0:28:1703101621:29:0|1:33953:2:My mcdonalds order:3::5:3:49:14092610:50:RealGDVerse:10:883:7:2:14:41:19::51:82785965,11012303,38557238,18931295,11255719,61408958,26162113,72014001,42633903,13752832,69768064,49186967,77554979,22294605,70549760,66416136,50525701,89933948,37039661,58976282,6988127,86449162,3134009,87727825,82995551,73004601,57585857,82139948,95318968,69925593,1203245,69765381,50647963,67254591,14370474,96968200,93201502,92509265,65430141,56495221,76489404,91963243,41035356,62427241,68752244,69996378,26880009,7360312,79013891,65269818,76963460,88732322,11171792:55:0:56:0:28:1703206770:29:1703428545|1:12460:2:My McDonalds Order:3:bWNkb25hbA==:5:1:49:4236858:50:tim55:10:1703:7:4:14:38:19::51:82931130,69309640,56455492,36619357,55320441:55:0:56:0:28:1703087812:29:0|1:45077:2:My McDonalds Order:3:UmVhbA==:5:1:49:1839061:50:CreatorFreeze:10:1000:7:5:14:24:19::51:80840474,30963660,79412478,14456417,61293573,71971062,86929245,86742812,58038680:55:0:56:0:28:1703307069:29:0|1:29628:2:My mcdonalds order:3:YmFzZWQgb2ZmIGEgc3BvdGlmeSBwbGF5bGlzdCBvciBzb21ldGhpbmc=:5:3:49:10055542:50:RussianRobTop:10:1827:7:10:14:23:19::51:78111123,34889235,80840474,11171792,71480069,84904479,97589710,443669,4460853,72443435,97590104,13550658,2056444,86742812:55:0:56:0:28:1703180209:29:1703614964|1:68104:2:My McDonalds Order:3:TXkgcmVhbCBNY0RvbmFsZHMgb3JkZXIu:5:1:49:25642445:50:Anjixdude25z:10:691:7:9:14:17:19::51:78111123,59413153,12664426,97172976,87995257,85508683,89490621,72811779,10558915,9007089,84904479,27742076,61718673,27090448:55:0:56:0:28:1703571483:29:0#10532982:CreatorFreeze:1839061|14827098:tim55:4236858|15479163:tricipital:6061424|92900676:RussianRobTop:10055542|98535835:Jexamania:10722530|139957548:RealGDVerse:14092610|147859835:ZohMyGoodnessGD:14542509|25220930:GD2G:17062290|221186876:Anjixdude25z:25642445#9999:0:10#f5da5823d94bbe7208dd83a30ff427c7d88fdb99");
+        log_glaze(r);
+        
         expect(r.lists()[0].listID() == 10834_i);
         expect(r.lists()[0].listName() == "my mcdonalds order");
         expect(r.lists()[0].version() == 1_i);

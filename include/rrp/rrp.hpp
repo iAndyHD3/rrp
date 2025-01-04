@@ -136,6 +136,7 @@ struct IndexedValueMap
 
 struct ValueMapContainer
 {
+    static constexpr auto glaze_reflect = false;
     template<typename T>
     static T parse(std::string_view str)
     {
@@ -182,7 +183,11 @@ concept has_non_empty_delim = requires {!T::DELIM.size() != 0;};
 
 #define RRP_DELIM(D) static constexpr reflect::fixed_string DELIM = D
 
-struct DelimBasedContainerBase {};
+struct DelimBasedContainerBase
+{
+    static constexpr auto glaze_reflect = false;
+};
+
 template<typename T, reflect::fixed_string D>
 struct DelimBasedContainer : DelimBasedContainerBase
 {
@@ -216,6 +221,8 @@ struct DelimBasedContainer : DelimBasedContainerBase
 
 struct SimpleDelimSeparatedBase
 {
+    static constexpr auto glaze_reflect = false;
+
     template<typename T>
     static T parse(std::string_view str)
     {
