@@ -7,22 +7,25 @@ project(rrp)
 ############################################################
 
 #Generate the static library from the library sources
-add_library(rrp STATIC src/rrp.cpp include/rrp/rrp.hpp include/rrp/rrp_glaze.hpp)
+add_library(rrp STATIC src/rrp.cpp)
 
 target_include_directories(rrp PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_compile_features(rrp PUBLIC cxx_std_23)
 
 
-if(PROJECT_IS_TOP_LEVEL)
 
-add_subdirectory(test)
+
+
+
+if(RRP_ENABLE_MATJSON)
+include(${CMAKE_SOURCE_DIR}/CPM.cmake)
+CPMAddPackage("gh:geode-sdk/json#82b1552")
+target_link_libraries(rrp PUBLIC mat-json)
 
 endif()
 
-if(RRP_ENABLE_GLAZE)
-include(CPM.cmake)
-CPMAddPackage("gh:stephenberry/glaze#e652b11")
-target_link_libraries(rrp PUBLIC glaze::glaze)
+if(PROJECT_IS_TOP_LEVEL)
 
+add_subdirectory(test)
 
 endif()

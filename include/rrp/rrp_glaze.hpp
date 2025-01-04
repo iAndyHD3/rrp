@@ -4,21 +4,21 @@
 #include "reflect"
 #include "rrp/rrp.hpp"
 #include <concepts>
-#include <glaze/core/opts.hpp>
-#include <glaze/json/json_t.hpp>
-#include <glaze/json/write.hpp>
 #include <string_view>
+#include <type_traits>
 
-#if !(__has_include(<glaze/glaze.hpp>))
+#if !(__has_include(<matjson.hpp>))
 
-#error Glaze not found
+#error matjson not found
 #endif
 
-#include <glaze/glaze.hpp>
+#include <matjson.hpp>
+#include <matjson/std.hpp>
 
 struct IndexedValueWIndexMember
 {
-   glz::json_t value{};
+   matjson::Value value{};
+   std::string name;
    int index;
 
    bool operator<(const auto& rhs) {
@@ -26,100 +26,89 @@ struct IndexedValueWIndexMember
    }
 };
 
-template<> struct glz::meta<IndexedValueWIndexMember> {
-   static constexpr auto value{ &IndexedValueWIndexMember::value };
-};
-
-
-namespace glz::detail
+namespace rrp
 {
 
-std::vector<json_t> delimBaseConverter(const auto& v)
+inline std::string fix_key_name(std::string_view name)
 {
-   std::cout << "NORMAL: ";
-   for(auto& a : v)
-   {
-      std::cout << a << ",";
-   }
-   std::cout << "\n";
-   std::vector<json_t> ret;
-   std::copy(v.begin(), v.end(), std::back_inserter(ret));
-
-   return ret;
+   if(name.substr(0, 2) != "m_") return std::string(name);
+   return std::string(name.substr(2));
 }
 
 
-template <class T>
-   requires std::derived_from<T, ::rrp::ValueMapContainer>
-struct to<JSON, T> {
-   template <auto Opts>
-   static void op(const T& type, auto&&... args) noexcept {
-      std::vector<std::pair<std::string, IndexedValueWIndexMember>> map;
-      
-      ::reflect::for_each([&](auto I){
-         std::string_view name = ::reflect::member_name<I>(type);
-         if(name.substr(0, 2) == "m_") name = name.substr(2);
-         using M = std::remove_reference_t<decltype(::reflect::get<I>(type))>;
-         using V = decltype(M::value);
-         int key = M::KEY;
-
-         if constexpr(std::derived_from<V, rrp::DelimBasedContainerBase>)
+template<typename R>
+matjson::Value write_json(R&& t)
+{
+   using T = std::remove_reference_t<R>;
+   if constexpr(std::derived_from<T, rrp::ValueMapContainer>)
+   {
+      auto globret = matjson::Value::object();
+      std::vector<IndexedValueWIndexMember> orderVec;
+      reflect::for_each([&](auto I){
+         using M = std::remove_reference_t<decltype(reflect::get<I>(t))>;
+         auto&& member = reflect::get<I>(t);
+         auto&& name = reflect::member_name<I>(t);
+         if constexpr(std::is_convertible_v<decltype(M::value), matjson::Value>)
          {
-            map.emplace_back(std::string{name},
-               IndexedValueWIndexMember{
-                  .value = delimBaseConverter(::reflect::get<I>(type).value.values),
-                  .index = key
-               }
-            );
+            orderVec.emplace_back(IndexedValueWIndexMember{.value = member.value, .name = fix_key_name(name), .index = M::KEY});
          }
          else
          {
-            map.emplace_back( std::string{name},
-               IndexedValueWIndexMember{
-                  .value = ::reflect::get<I>(type).value,
-                  .index = key
-               }
-            );
+            orderVec.emplace_back(IndexedValueWIndexMember{.value = write_json(member), .name = fix_key_name(name), .index = M::KEY});
          }
-
-   }, type);
-
-      std::sort(map.begin(), map.end(), [](const auto& l, const auto& r){
-         return l.second.index < r.second.index;
-      });
-      write<JSON>::op<Opts>(map, args...);
+      }, t);
+      std::sort(orderVec.begin(), orderVec.end(), [](const auto& l, const auto& r){ return l.index < r.index; });
+      for(const auto& o : orderVec)
+      {
+         globret.set(o.name, o.value);
+      }
+      return globret;
    }
-};
+   else if constexpr(std::derived_from<T, DelimBasedContainerBase>)
+   {
+      auto ret = matjson::Value::array();
+      if constexpr(std::derived_from<typename T::type, ValueMapContainer> || std::derived_from<typename T::type, SimpleDelimSeparatedBase>)
+      {
+         for(const auto& valuemaps : t.values)
+         {
+            ret.push(write_json(valuemaps));
+         }
+      }
+      else if constexpr(std::is_convertible_v<typename T::type, matjson::Value>)
+      {
+         for(const auto& valuemaps : t.values)
+         {
+            ret.push(valuemaps);
+         }
+      }
 
-
-
-template <class T>
-   requires std::derived_from<T, ::rrp::SimpleDelimSeparatedBase>
-struct to<JSON, T> {
-   template <auto Opts>
-   static void op(const T& type, auto&&... args) noexcept {
-      glz::json_t::object_t map;
-      ::reflect::for_each([&](auto I){
-         std::string_view name = ::reflect::member_name<I>(type);
-         if(name.substr(0, 2) == "m_") name = name.substr(2);
-         map.emplace(name, ::reflect::get<I>(type));
-      }, type);
-      write<JSON>::op<Opts>(map, args...);
+      return ret;
    }
-};
-
-}  // namespace glz::detail
-
-
-
-template <typename T, int index>
-struct glz::meta<::rrp::IndexedValueMap<T, index>> {
-   static constexpr auto value{ &rrp::IndexedValueMap<T, index>::value };
-};
-
-template<typename T, reflect::fixed_string D>
-struct glz::meta<rrp::DelimBasedContainer<T, D>> {
-   static constexpr auto value { &rrp::DelimBasedContainer<T, D>::values };
-};
+   else if constexpr(std::derived_from<T, IndexedValueBase>)
+   {
+      return write_json(t.value);
+   }
+   else
+   {
+      auto ret = matjson::Value::object();
+      reflect::for_each([&](auto I){
+         using M = std::remove_reference_t<decltype(reflect::get<I>(t))>;
+         auto&& member = reflect::get<I>(t);
+         auto&& name = reflect::member_name<I>(t);
 
 
+         if constexpr(std::is_convertible_v<M, matjson::Value>)
+         {
+            ret.set(fix_key_name(name), member);
+         }
+         else
+         {
+            ret.set(fix_key_name(name), write_json(member));
+         }
+      }, t);
+
+      return ret;
+   }
+}
+
+}

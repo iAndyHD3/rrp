@@ -69,7 +69,7 @@ inline std::vector<std::string_view> splitByDelimStringView(std::string_view str
 			break;
 		}
 		tokens.emplace_back(str.substr(pos, end - pos));
-		pos = end + 1;
+		pos = end + delim.length();
 	}
 
 	return tokens;
@@ -111,9 +111,10 @@ inline std::unordered_map<int, std::string_view> splitByDelimToMap(std::string_v
     return tokens;
 }
 
+struct IndexedValueBase {};
 
 template<typename T, int index>
-struct IndexedValueMap
+struct IndexedValueMap : IndexedValueBase
 {
     using type = T;
     T value{};
@@ -145,10 +146,14 @@ struct ValueMapContainer
         T ret;
         auto tokens = splitByDelimToMap(str, T::DELIM);
         //myprint(tokens.size());
-        //for(const auto& k : tokens)
+        //if constexpr(T::DELIM == "~|~")
         //{
-        //    std::string x = std::to_string(k.first) + ":" + std::string(k.second);
-        //    myprint(x);
+        //    myprint(str);
+        //    for(const auto& k : tokens)
+        //    {
+        //        std::string x = std::to_string(k.first) + ":" + std::string(k.second);
+        //        myprint(x);
+        //    }
         //}
         reflect::for_each([&](auto I){
             using M = std::remove_reference_t<decltype(reflect::get<I>(ret))>;
@@ -191,7 +196,7 @@ struct DelimBasedContainerBase
 template<typename T, reflect::fixed_string D>
 struct DelimBasedContainer : DelimBasedContainerBase
 {
-    using value = T;
+    using type = T;
     static constexpr reflect::fixed_string DELIM = D;
     std::vector<T> values;
     operator std::vector<T>() { return values; }
