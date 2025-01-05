@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-
+#include <rrp/rrp.hpp>
 
 namespace rrp::base64
 {
@@ -53,4 +53,17 @@ inline std::string decode(std::string_view in) {
   return out;
 }
 
+
+template<typename T, int index> requires(std::is_same_v<T, std::string_view>)
+struct IndexedBase64String : ::rrp::IndexedValueMap<T, index>
+{
+    std::string decode()
+    {
+        return ::rrp::base64::decode(this->value); 
+    }
+};
+
+#define RRP_B64S_IVM_W_GETTER(T, index, name) \
+  RRP_IVM_W_GETTER(T, index, name) \
+  std::string name##_decoded() { return ::rrp::base64::decode(m_##name.value); }
 }

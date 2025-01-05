@@ -8,6 +8,8 @@
 #include <rrp/2.2/getGJRewards.hpp>
 #include <rrp/2.2/getGJScores20.hpp>
 #include <rrp/2.2/getGJMapPacks21.hpp>
+#include <rrp/2.2/getGJAccountComments20.hpp>
+#include <rrp/2.2/getGJComments21.hpp>
 
 #include "rrp/2.2/common.hpp"
 #include "rrp/rrp.hpp"
@@ -240,5 +242,30 @@ int main()
         expect(r.mappacks()[0].name() == "Cyclone Pack");
         expect(r.mappacks()[0].textColor().r == 255);
     };
+
+    "getGJAccountComments"_test = [](){
+        auto r = rrp::rrp<v22::getGJAccountComments20>("2~T2ggOGsgc3RhcnMgbmljZQ==~4~47~9~2 years~6~1808699|2~NzUwMCBzdGFycyBjOg==~4~10~9~2 years~6~1803945|2~SSBiZWF0IDYgaW5zYW5lIGRlbW9ucyBpbiAyNCBob3VycyBsbWFvOiBOZWNyb3BvbGlzLCBUaGUgQ2F2ZXJucyBJSSwgRWxlbWVudHMgWCwgWCBBZHZlbnR1cmUsIFNhZGlzbSwgYW5kIEJsYXN0ZXIgYzo=~4~23~9~3 years~6~1793260|2~L1wvXC9cIDwz~4~8~9~3 years~6~1785414|2~U2VudCBmcm9tIGlPUyBTaG9ydGN1dHMh~4~11~9~4 years~6~1776426|2~VGhpcyBjb21tZW50IHdhcyB1cGxvYWRlZCBmb3IgdGhlIEdEIERvY3Mh~4~7~9~4 years~6~1772719|2~VGhlIHRyaWxvZ3kgaGFzIGJlZW4gY29tcGxldGVkLi4uR0cgQWZ0ZXJtYXRoIQ==~4~8~9~4 years~6~1766450|2~Im93byIgLSBGb3VuZG15YmFsbA==~4~4~9~4 years~6~1766338|2~NTAwMCBzdGFycyE=~4~12~9~4 years~6~1756926|2~Qmxvb2RiYXRoIEdHISEh~4~25~9~5 years~6~1745624#74:0:10");
+        expect(r.comments()[0].likes() == 47_i);
+        expect(r.comments()[0].age() == "2 years");
+        expect(r.comments()[0].messageID() == 1808699_i);
+        expect(r.comments()[0].comment_decoded() == "Oh 8k stars nice");
+
+        expect(r.comments()[1].likes() == 10_i);
+        expect(r.comments()[1].messageID() == 1803945_i);
+    };
+
+    "getGJComments"_test = [](){
+        auto r = rrp::rrp<v22::getGJComments21>("2~NzQgYXR0IHdoYXR0~3~210153877~4~0~7~0~10~4~9~15 minutes~6~46232563:1~dooblom~9~91~10~19~11~11~14~2~15~2~16~23631435|2~QUFBQUFBQUFBQQ==~3~267641474~4~0~7~0~10~37~9~17 minutes~6~46232555:1~CaAlexDa~9~26~10~12~11~2~14~0~15~2~16~19216511|2~SSBzaG91bGQgc3RhcnQgZ3JpbmRpbmcgY2hhbGxlbmdlcyEh~3~263506358~4~0~7~0~10~100~9~31 minutes~6~46232489:1~0bv~9~35~10~3~11~12~14~0~15~0~16~30775227|2~MTk1NiBhdHRlbXB0cyBpbiBwcmFjdGljZSBGSU5BTExZIQ==~3~245747440~4~0~7~0~10~0~9~1 hour~6~46232231:1~artistboylo~9~9~10~6~11~16~14~7~15~2~16~28706271|2~Ui5JLlAgQm8g~3~268611032~4~-2~7~0~10~100~9~5 hours~6~46231318:1~xStixGDx~9~11~10~12~11~12~14~6~15~0~16~31063613|2~bG1hbw==~3~147836572~4~1~7~0~10~5~9~8 hours~6~46231019:1~NGDK~9~1~10~1~11~12~14~6~15~0~16~15162356|2~NzQzIGF0dCBpbiBwcmFjdGljZSx3dw==~3~263745181~4~1~7~0~10~0~9~9 hours~6~46230852:1~eskibime~9~37~10~18~11~12~14~5~15~0~16~30290292|2~d3Rm~3~267359964~4~1~7~0~10~11~9~9 hours~6~46230775:1~knoxoniaa~9~58~10~102~11~12~14~0~15~2~16~30998487|2~W3ZdZXJ0aWNhbCBbc11wZWVkIFtjXW9uc2VydmF0aW9uIGlzIGEgc3VwZXIgbWFyaW8gNjQgc3BlZWRydW5uaW5nIHN0cmF0ZWd5Lg==~3~268138873~4~1~7~0~10~0~9~9 hours~6~46230770:1~ultrabucket~9~108~10~15~11~23~14~0~15~2~16~31054190|2~R0cgMTQgYXR0LiAoSSB3b250IHNob3cgbXkgcGVyY2VudGFnZSBqdXN0IHRydXN0IG1lIG9uIHRoaXMgb25lKQ==~3~116404059~4~1~7~0~10~0~9~10 hours~6~46230718:1~themuffinthief~9~6~10~12~11~9~14~2~15~2~16~18175167#46173:0:10");
+        expect(r.comments()[0].comment.comment() == "NzQgYXR0IHdoYXR0");
+        expect(r.comments()[0].comment.authorAccountID() == 210153877_i);
+        expect(r.comments()[0].user.userName() == "dooblom");
+        expect(r.comments()[0].user.iconID() == 91_i);
+
+        expect(r.comments()[1].comment.comment() == "QUFBQUFBQUFBQQ==");
+        expect(r.comments()[1].comment.authorAccountID() == 267641474_i);
+        expect(r.comments()[1].user.userName() == "CaAlexDa");
+        expect(r.comments()[1].user.iconID() == 26_i);
+    };
+    
 
 }

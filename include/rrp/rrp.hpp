@@ -113,13 +113,13 @@ inline std::unordered_map<int, std::string_view> splitByDelimToMap(std::string_v
 
 struct IndexedValueBase {};
 
+
+
 template<typename T, int index>
 struct IndexedValueMap : IndexedValueBase
 {
     using type = T;
     T value{};
-    operator T() { return value; }
-    T* operator->() { return value; }
 
     constexpr static int KEY = index;
     static auto parse(std::string_view str)
@@ -133,6 +133,8 @@ struct IndexedValueMap : IndexedValueBase
         return ret;
     }
 };
+
+
 
 
 struct ValueMapContainer
