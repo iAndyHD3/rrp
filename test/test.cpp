@@ -10,6 +10,7 @@
 #include <rrp/2.2/getGJMapPacks21.hpp>
 #include <rrp/2.2/getGJAccountComments20.hpp>
 #include <rrp/2.2/getGJComments21.hpp>
+#include <rrp/2.2/getGJSongInfo.hpp>
 
 #include "rrp/2.2/common.hpp"
 #include "rrp/rrp.hpp"
@@ -267,5 +268,21 @@ int main()
         expect(r.comments()[1].user.iconID() == 26_i);
     };
     
+    "getGJSongInfo"_test = [](){
+        auto r = rrp::rrp<v22::getGJSongInfo>("1~|~10012354~|~2~|~Always Be~|~3~|~10003105~|~4~|~Netrum~|~5~|~3.27~|~6~|~~|~10~|~CUSTOMURL~|~7~|~~|~11~|~1~|~12~|~10003799.10003800~|~13~|~~|~14~|~8");
+        log_glaze(r);
+        expect(r.song.songID() == 10012354_i);
+        expect(r.song.name() == "Always Be");
+        expect(r.song.artistID() == 10003105_i);
+        expect(r.song.artistName() == "Netrum");
+        expect(r.song.sizeInMB() == 3.27f);
+        expect(r.song.downloadLink() == "CUSTOMURL");
+        expect(r.song.nongEnum() == 1_i);
 
+        expect(r.song.extraArtistsIDs()[0] == 10003799_i);
+        expect(r.song.extraArtistsIDs()[1] == 10003800_i);
+
+    };
+    
+//10012354
 }

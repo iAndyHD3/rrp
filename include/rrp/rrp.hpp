@@ -300,7 +300,9 @@ T rrp(std::string_view str)
 
 
 
-
+#define RRP_IVM_DBC_W_GETTER(type, index, delim, name) \
+    rrp::IndexedValueMap<rrp::DelimBasedContainer<type, delim>, index> m_##name; \
+    std::vector<type> name() { return m_##name.value.values; }
 
 
 //TODO

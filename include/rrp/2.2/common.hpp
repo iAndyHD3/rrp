@@ -148,10 +148,10 @@ struct SongObject : rrp::ValueMapContainer
 {
     static constexpr reflect::fixed_string DELIM = "~|~";
     RRP_IVM_W_GETTER(int, 1, songID);
-    RRP_IVM_W_GETTER(int, 2, artistID);
-    RRP_IVM_W_GETTER(int, 5, sizeInMB);
+    RRP_IVM_W_GETTER(int, 3, artistID);
+    RRP_IVM_W_GETTER(float, 5, sizeInMB);
     RRP_IVM_W_GETTER(int, 9, songPriority);
-    RRP_IVM_W_GETTER(int, 9, nongEnum);
+    RRP_IVM_W_GETTER(int, 11, nongEnum);
     RRP_IVM_W_GETTER(int, 14, newType);
 
     RRP_IVM_W_GETTER(std::string_view, 2, name);
@@ -160,7 +160,8 @@ struct SongObject : rrp::ValueMapContainer
     RRP_IVM_W_GETTER(std::string_view, 7, artistYTURL);
     RRP_IVM_W_GETTER(std::string_view, 10, downloadLink);
     //TODO parse this (simple delim container)
-    RRP_IVM_W_GETTER(std::string_view, 12, extraArtistsID);
+
+    RRP_IVM_DBC_W_GETTER(int, 12, ".", extraArtistsIDs)
     RRP_IVM_W_GETTER(std::string_view, 15, extraArstistNames);
 
     RRP_IVM_W_GETTER(bool, 8, isArtistScouted);
@@ -176,9 +177,7 @@ struct PageInfo : public rrp::SimpleDelimSeparatedBase
     int amount;
 };
 
-#define RRP_IVM_DBC_W_GETTER(type, index, delim, name) \
-    rrp::IndexedValueMap<rrp::DelimBasedContainer<type, delim>, index> m_##name; \
-    std::vector<type> name() { return m_##name.value.values; }
+
 
 struct ListObject : public rrp::ValueMapContainer
 {
