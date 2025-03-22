@@ -1,6 +1,6 @@
 #pragma once
-#include "CommentObject.hpp"
-#include "rrp/rrp.hpp"
+#include <rrp/2.2/CommentObject.hpp>
+#include <rrp/rrp.hpp>
 
 namespace rrp::v22
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SongObject.hpp"
+#include <rrp/2.2/SongObject.hpp>
 
 namespace rrp::v22
 {

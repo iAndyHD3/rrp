@@ -1,12 +1,12 @@
 #pragma once
-#include "PageInfo.hpp"
-#include "LevelObject.hpp"
-#include "CreatorObject.hpp"
-#include "SongObject.hpp"
+#include <rrp/2.2/PageInfo.hpp>
+#include <rrp/2.2/LevelObject.hpp>
+#include <rrp/2.2/CreatorObject.hpp>
+#include <rrp/2.2/SongObject.hpp>
 
 namespace rrp::v22
 {
-struct GetGJLevels21
+struct getGJLevels21
 {
 
     RRP_DELIM("#");

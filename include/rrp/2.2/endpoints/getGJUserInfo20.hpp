@@ -1,10 +1,10 @@
 #pragma once
-#include "UserObject.hpp"
+#include <rrp/2.2/UserObject.hpp>
 
 namespace rrp::v22
 {
 
-struct GetUserInfo
+struct getGJUserInfo20
 {
     RRP_DELIM("");
     rrp::v22::UserObject user;

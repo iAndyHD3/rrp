@@ -183,8 +183,10 @@ struct SimpleIntResponseBase
 
 
 template<typename T>
-T rrp(std::string_view str)
+std::optional<T> rrp(std::string_view str)
 {
+    if (str == "-1") return {};
+
     T ret;
 
     if constexpr(Parsable<T>)
@@ -196,7 +198,8 @@ T rrp(std::string_view str)
     else if constexpr(reflect::size<T>() == 1)
     {
         using M = std::remove_reference_t<decltype(reflect::get<0>(ret))>;
-        reflect::get<0>(ret) = rrp::rrp<M>(str);
+        
+        reflect::get<0>(ret) = *rrp::rrp<M>(str);
         return ret;
     }
     else
@@ -228,8 +231,6 @@ T rrp(std::string_view str)
         return ret;
     }
 }
-
-
 
 #define RRP_IVM_DBC_W_GETTER(type, index, delim, name) \
     rrp::IndexedValueMap<rrp::DelimBasedContainer<type, delim>, index> m_##name; \

@@ -1,11 +1,11 @@
 #pragma once
-#include "MappackObject.hpp"
-#include "PageInfo.hpp"
+#include <rrp/2.2/MappackObject.hpp>
+#include <rrp/2.2/PageInfo.hpp>
 
 namespace rrp::v22
 {
 
-struct GetGJMapPacks21
+struct getGJMapPacks21
 {
     RRP_DELIM("#");
 

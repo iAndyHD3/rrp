@@ -1,10 +1,13 @@
 #pragma once
-#include "rrp/rrp.hpp"
-#include "ListObject.hpp"
-#include "CreatorObject.hpp"
-#include "PageInfo.hpp"
+#include <rrp/rrp.hpp>
+#include <rrp/2.2/ListObject.hpp>
+#include <rrp/2.2/CreatorObject.hpp>
+#include <rrp/2.2/PageInfo.hpp>
 
-struct GetLevelLists
+
+namespace rrp::v22
+{
+struct getGJLevelLists
 {
     RRP_DELIM("#");
     RRP_DBC_W_GETTER(rrp::v22::ListObject, "|", lists);
@@ -13,3 +16,5 @@ struct GetLevelLists
     rrp::v22::PageInfo pageInfo;
     std::string_view hash;
 };
+
+}

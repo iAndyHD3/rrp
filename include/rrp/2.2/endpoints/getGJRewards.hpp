@@ -1,5 +1,4 @@
 #pragma once
-#include "rrp/2.2/getGJRewards.hpp"
 #include <cstdint>
 #include <rrp/rrp.hpp>
 #include <rrp/xor.hpp>

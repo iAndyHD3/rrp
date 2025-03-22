@@ -1,11 +1,11 @@
 #pragma once
+#include "rrp/2.2/LevelObject.hpp"
 #include "rrp/rrp.hpp"
-#include "LevelObject.hpp"
 
 namespace rrp::v22
 {
 
-struct DownloadGJLevel22 : SimpleDelimSeparatedBase
+struct downloadGJLevel22 : SimpleDelimSeparatedBase
 {
     RRP_DELIM("#");
     LevelObject level;

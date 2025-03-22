@@ -4,7 +4,7 @@
 namespace rrp::v22
 {
 
-struct GetDailyLevel : public SimpleDelimSeparatedBase
+struct getGJDailyLevel : public SimpleDelimSeparatedBase
 {
     RRP_DELIM("|");
     int levelIndex;
