@@ -1,22 +1,19 @@
 #pragma once
-#include <source_location>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
-#include <string>
 #include <string_view>
 #include "reflect"
-#include <iostream>
 #include "fast_float.h"
-#include <optional>
+#include "fromString.hpp"
 
 namespace rrp
 {
 
-inline void myprint(auto a, std::source_location x = std::source_location::current())
-{
-    std::cout << a << " | " << x.file_name() << ":" << x.line() << '\n';
-}
+//inline void myprint(auto a, std::source_location x = std::source_location::current())
+//{
+//    std::cout << a << " | " << x.file_name() << ":" << x.line() << '\n';
+//}
 
 template<typename T>
 concept Parsable = requires(T t, std::string_view str) {
@@ -24,95 +21,12 @@ concept Parsable = requires(T t, std::string_view str) {
     { T::template parse<T>(str) } -> std::same_as<T>;
 };
 
-template<typename T>
-concept BasicTypeOrString = std::integral<T> || std::floating_point<T> || std::same_as<T, bool> || 
-                            std::same_as<T, std::string> || std::same_as<T, std::string_view>;
 
-template<BasicTypeOrString T>
-std::optional<T> fromString(std::string_view str)
-{
-    if constexpr (std::is_same_v<T, std::string>)
-    {
-        return std::string(str);
-    }
-    else if constexpr (std::is_same_v<T, std::string_view>)
-    {
-        return str;
-    }
 
-    else if constexpr (std::is_same_v<T, bool>)
-	{
-		return str == "1" || str == "true";
-	}
-    else
-	{
-		T value;
-		if (fast_float::from_chars(str.data(), str.data() + str.size(), value).ec == std::errc())
-		{
-			return value;
-		}
-	}
-	return {};
-}
-inline std::vector<std::string_view> splitByDelimStringView(std::string_view str, std::string_view delim)
-{
-	std::vector<std::string_view> tokens;
-	size_t pos = 0;
-	size_t len = str.length();
-
-	while (pos < len)
-	{
-		size_t end = str.find(delim, pos);
-		if (end == std::string_view::npos)
-		{
-			tokens.emplace_back(str.substr(pos));
-			break;
-		}
-		tokens.emplace_back(str.substr(pos, end - pos));
-		pos = end + delim.length();
-	}
-
-	return tokens;
-}
-
-inline std::unordered_map<int, std::string_view> splitByDelimToMap(std::string_view str, std::string_view delim)
-{
-    std::unordered_map<int, std::string_view> tokens;
-    size_t pos = 0;
-    size_t len = str.length();
-
-    while (pos < len)
-    {
-        // Find the position of the delimiter for the key
-        size_t key_end = str.find(delim, pos);
-        if (key_end == std::string_view::npos) break; // No more delimiters found, end of string
-
-        // Extract the key
-        std::string_view key = str.substr(pos, key_end - pos);
-        pos = key_end + delim.length(); // Move past the delimiter
-
-        // Find the position of the delimiter for the value
-        size_t value_end = str.find(delim, pos);
-        if (value_end == std::string_view::npos) {
-            // If no delimiter found for value, it means value is until the end of string
-            std::string_view value = str.substr(pos);
-            if (auto k = fromString<int>(key)) tokens.emplace(*k, value);
-            break;
-        }
-
-        // Extract the value
-        std::string_view value = str.substr(pos, value_end - pos);
-        pos = value_end + delim.length(); // Move past the delimiter
-
-        // Insert into map if key can be converted to int
-        if (auto k = fromString<int>(key)) tokens.emplace(*k, value);
-    }
-
-    return tokens;
-}
+std::vector<std::string_view> splitByDelimStringView(std::string_view str, std::string_view delim);
+std::unordered_map<int, std::string_view> splitByDelimToMap(std::string_view str, std::string_view delim);
 
 struct IndexedValueBase {};
-
 
 
 template<typename T, int index>
@@ -252,50 +166,67 @@ struct SimpleDelimSeparatedBase
     }
 };
 
-
+//expects `value` to be a member of parent
+struct SimpleIntResponseBase
+{
+    template<typename T>
+    static T parse(std::string_view str)
+    {
+        T ret;
+        if(auto val = fromString<std::int32_t>(str); *val > 0)
+        {
+            ret.value.emplace(*val);
+        }
+        return ret;
+    }
+};
 
 
 template<typename T>
 T rrp(std::string_view str)
 {
     T ret;
+
     if constexpr(Parsable<T>)
     {
         return T::template parse<T>(str);
     }
+    
+    //wrapper such that struct { int a; } is treated as that member
     else if constexpr(reflect::size<T>() == 1)
     {
         using M = std::remove_reference_t<decltype(reflect::get<0>(ret))>;
         reflect::get<0>(ret) = rrp::rrp<M>(str);
         return ret;
     }
-
-
-    auto tokens = splitByDelimStringView(str, T::DELIM);
-    auto it = tokens.begin();
-    reflect::for_each([&](auto I)
+    else
     {
-        if(it == tokens.end()) return;
+        auto tokens = splitByDelimStringView(str, T::DELIM);
+        auto it = tokens.begin();
+        reflect::for_each([&](auto I)
+        {
+            if(it == tokens.end()) return;
 
-        using M = std::remove_reference_t<decltype(reflect::get<I>(ret))>;
-        auto&& member = reflect::get<I>(ret);
-        //myprint(reflect::type_name<M>());
-        if constexpr(Parsable<M>)
-        {
-            member = M::template parse<M>(*it);
-            ++it;
-        }
-        else if constexpr(BasicTypeOrString<M>)
-        {
-            if(auto v = fromString<M>(*it))
+            using M = std::remove_reference_t<decltype(reflect::get<I>(ret))>;
+            auto&& member = reflect::get<I>(ret);
+            //myprint(reflect::type_name<M>());
+            if constexpr(Parsable<M>)
             {
-                member = *v;
+                member = M::template parse<M>(*it);
+                ++it;
             }
-            ++it;
-        }
-    }, ret);
+            else if constexpr(BasicTypeOrString<M>)
+            {
+                if(auto v = fromString<M>(*it))
+                {
+                    member = *v;
+                }
+                ++it;
+            }
+        }, ret);
 
-    return ret;
+        return ret;
+    }
 }
 
 

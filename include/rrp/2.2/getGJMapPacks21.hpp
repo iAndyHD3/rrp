@@ -1,6 +1,6 @@
 #pragma once
 #include "MappackObject.hpp"
-#include "rrp/2.2/common.hpp"
+#include "PageInfo.hpp"
 
 namespace rrp::v22
 {

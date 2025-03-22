@@ -1,0 +1,16 @@
+[build-system]
+requires = ["scikit-build-core", "pybind11", "ninja"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "rrp"
+version = "0.1.0"
+
+[tool.scikit-]
+
+[tool.scikit-build]
+build-dir = "build-bindings"
+cmake.build-type = "Release"
+
+ninja.make-fallback = false
+cmake.args = [ "-DRRP_PYTHON=1", "-G Ninja"]

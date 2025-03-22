@@ -1,5 +1,8 @@
 #pragma once
-#include "common.hpp"
+#include "PageInfo.hpp"
+#include "LevelObject.hpp"
+#include "CreatorObject.hpp"
+#include "SongObject.hpp"
 
 namespace rrp::v22
 {

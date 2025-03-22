@@ -1,6 +1,8 @@
 #pragma once
-#include "common.hpp"
 #include "rrp/rrp.hpp"
+#include "ListObject.hpp"
+#include "CreatorObject.hpp"
+#include "PageInfo.hpp"
 
 struct GetLevelLists
 {

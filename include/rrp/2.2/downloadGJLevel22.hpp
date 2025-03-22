@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
 #include "rrp/rrp.hpp"
+#include "LevelObject.hpp"
 
 namespace rrp::v22
 {
