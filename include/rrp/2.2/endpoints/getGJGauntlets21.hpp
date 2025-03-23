@@ -11,7 +11,7 @@ struct GauntletObject : public ValueMapContainer
     RRP_IVM_DBC_W_GETTER(int, 3, ",", levels);
 };
 
-struct getGJGauntlets
+struct getGJGauntlets21
 {
     RRP_DELIM("#");
     RRP_DBC_W_GETTER(GauntletObject, "|", gauntlets)

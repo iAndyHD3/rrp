@@ -6,7 +6,7 @@
 namespace rrp::v22
 {
 
-struct getGJScores
+struct getGJScores20
 {
     RRP_DELIM("");
     RRP_DBC_W_GETTER(UserObject, "|", users);
