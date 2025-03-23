@@ -45,8 +45,6 @@ struct getGJRewards
     RRP_DELIM("|");
     ChestRewardEncodedData data;
     std::string_view hash;
-
-
 };
 
 }

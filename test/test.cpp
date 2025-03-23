@@ -11,6 +11,7 @@
 #include <rrp/2.2/endpoints/getGJComments21.hpp>
 #include <rrp/2.2/endpoints/getGJSongInfo.hpp>
 #include <rrp/2.2/endpoints/uploadGJLevel21.hpp>
+#include <rrp/2.2/endpoints/getGJMessages20.hpp>
 
 
 
@@ -23,23 +24,23 @@ std::ostream& operator<<(std::ostream& os, std::optional<T> const& opt)
 
 #include "ut.hpp"
 
-//#include <filesystem>
-//#include <rrp/rrp_glaze.hpp>
-//#include <matjson.hpp>
+#include <filesystem>
+#include <rrp/rrp_glaze.hpp>
 
 using namespace rrp;
 using namespace rrp::v22;
 using namespace boost::ut;
 
 
-/*
+
 
 void printid(auto& ptr)
 {
     std::cout << ptr.levelID() << "\n";
 }
+
 int fileCount = 0;
-void //log_glaze(const auto& response)
+void log_glaze(const auto& response)
 {
     
 
@@ -54,8 +55,6 @@ void //log_glaze(const auto& response)
     std::cout << "SAVED TO: " << file.string() << std::endl;
     fileCount = fileCount + 1;
 }
-
-*/
 
 int main()
 {
@@ -76,7 +75,7 @@ int main()
 
     "getGJLevels21.php"_test = [](){
         auto r = *rrp::rrp<rrp::v22::getGJLevels21>("1:10565740:2:Bloodbath:5:3:6:503085:8:10:9:50:10:90849443:12:0:13:21:14:4285711:17:1:43:6:25::18:10:19:10330:42:0:45:24746:3:V2hvc2UgYmxvb2Qgd2lsbCBiZSBzcGlsdCBpbiB0aGUgQmxvb2RiYXRoPyBXaG8gd2lsbCB0aGUgdmljdG9ycyBiZT8gSG93IG1hbnkgd2lsbCBzdXJ2aXZlPyBHb29kIGx1Y2suLi4=:15:3:30:7679228:31:0:37:0:38:0:39:0:46:1:47:2:35:467339|1:21761387:2:Bloodbath Z:5:1:6:3277407:8:10:9:20:10:10030910:12:0:13:20:14:334046:17:1:43:4:25::18:10:19:17840:42:0:45:0:3:UmVtYWtlIG9mIEJCLCBidXQgU2hvcnRlciBhbmQgbXVjaCBlYXNpZXIgWEQgTW9yZSBvZiBhIGdhbWVwbGF5IGxldmVsISAgSnVzdCBhIGZ1biBlYXN5IGRlbW9uLiBWZXJpZmllZCBCeSBYaW9kYXplciEgRW5qb3kgOkQ=:15:3:30:0:31:0:37:3:38:1:39:10:46:1:47:2:35:223469|1:64968478:2:Bloodbath but no:5:1:6:19747356:8:10:9:50:10:2778887:12:0:13:21:14:171471:17::43:6:25::18:8:19:24992:42:0:45:23233:3:Qmxvb2RiYXRoLCBJdCdzIG5vdCBldmVuIHRoaXM=:15:3:30:0:31:0:37:0:38:1:39:8:46:1:47:2:35:706340|1:75795864:2:Bloodbath:5:3:6:12348083:8:10:9:40:10:473190:12:0:13:22:14:14499:17::43:5:25::18:7:19:25025:42:0:45:55985:3:VGhhbmtzIHRvIGV2ZXJ5b25lIGluIG15IGRpc2NvcmQgc2VydmVyIHRoYXQgY29udHJpYnV0ZWQ=:15:3:30:75393195:31:0:37:0:38:1:39:6:46:1:47:2:35:513064#503085:Riot:37415|3277407:Zyzyx:88354|12348083:KNOEPPEL:3009121|19747356:Texic:6152129#1~|~223469~|~2~|~ParagonX9 - HyperioxX~|~3~|~31~|~4~|~ParagonX9~|~5~|~3.77~|~6~|~~|~10~|~http%3A%2F%2Faudio.ngfiles.com%2F223000%2F223469_ParagonX9___HyperioxX.mp3~|~7~|~~|~8~|~1~:~1~|~467339~|~2~|~At the Speed of Light~|~3~|~52~|~4~|~Dimrain47~|~5~|~9.56~|~6~|~~|~10~|~https%3A%2F%2Fgeometrydashcontent.b-cdn.net%2Fsongs%2F467339.mp3~|~7~|~~|~8~|~1~:~1~|~513064~|~2~|~EnV - Uprise~|~3~|~149~|~4~|~Envy~|~5~|~8.71~|~6~|~~|~10~|~http%3A%2F%2Faudio.ngfiles.com%2F513000%2F513064_EnV---Uprise.mp3~|~7~|~UCaRqE7rKwJl1BvMRU4FFVJQ~|~8~|~1~:~1~|~706340~|~2~|~-At the Speed of Light- (8 bit Remix)~|~3~|~46724~|~4~|~ThaPredator~|~5~|~4.78~|~6~|~~|~10~|~http%3A%2F%2Faudio.ngfiles.com%2F706000%2F706340_-At-the-Speed-of-Light--8-.mp3~|~7~|~~|~8~|~1#4:0:10#1664b8bb919b0822a4408752c37a9fb5f651f813");
-    
+        log_glaze(r);
         ////log_glaze(r);
 
 
@@ -225,7 +224,7 @@ int main()
     };
     "getGJRewards.php"_test = [](){
         auto r = *rrp::rrp<v22::getGJRewards>("rEwZGeWpJfEMPDQUOAgIPAQIKBg4DCAAPX1deVFNfV14fDQFSDR9UWAdcH1NfV14fU19XXlFRDgMJBwRbCwkEDQEJDQIPCQsMAhkNHQgeBQMADgsBAwECAAAJHQkAGQgdCAgADwcCAg==|745d883ead4fc5888e3b7cac1fbfcdc72a85e2d5");
-        //log_glaze(r);
+        log_glaze(r);
 
         //LSxDq:4460760:837202:ffffffff-88c5-aa6d-ffff-ffffcd72151b:1688850:0:40,4,0,0:1694:0:250,12,1,0:566:0 | C:/Users/User/Desktop/projects/cpp/rrp/include\rrp/2.2/getGJRewards.hpp:40
         expect(r.data.randomString == "LSxDq");
@@ -273,10 +272,9 @@ int main()
         expect(r.comments()[0].comment.authorAccountID() == 210153877_i);
         expect(r.comments()[0].user.userName() == "dooblom");
         expect(r.comments()[0].user.iconID() == 91_i);
-
-        expect(r.comments()[1].comment.comment() == "QUFBQUFBQUFBQQ==");
         expect(r.comments()[0].comment.comment_decoded() == "74 att whatt");
 
+        expect(r.comments()[1].comment.comment() == "QUFBQUFBQUFBQQ==");
         expect(r.comments()[1].comment.authorAccountID() == 267641474_i);
         expect(r.comments()[1].user.userName() == "CaAlexDa");
         expect(r.comments()[1].user.iconID() == 26_i);
@@ -319,8 +317,14 @@ int main()
         expect(res->levelID() == 116368054_i);
         expect(res->listID() == 116368054_i);
     };
-    
 
+    "getGJMessages20"_test = [](){
+        auto res = *rrp::rrp<getGJMessages20>("6:RayDeeUx:3:10709102:2:1941705:1:89220349:4:YXNkZg==:8:1:9:0:7:1 month|6:RayDeeUx:3:10709102:2:1941705:1:89220347:4:Zm9vYmFy:8:1:9:0:7:1 month|6:RayDeeUx:3:10709102:2:1941705:1:89220346:4:Zm9vYmFy:8:1:9:0:7:1 month|6:RayDeeUx:3:10709102:2:1941705:1:89220345:4:cGlwZWJvbWI=:8:1:9:0:7:25 minutes|6:RayDeeUx:3:10709102:2:1941705:1:89220337:4:Zm9vYmFy:8:1:9:0:7:25 minutes|6:GDAuth:3:162487010:2:16821094:1:89220288:4:aGk=:8:1:9:0:7:1 month#0:0:50");
+        
+        expect(res.messages()[0].title_decoded() == "asdf");
+        expect(res.messages()[0].age() == "1 month");
+        expect(res.messages()[0].userName() == "RayDeeUx");
 
-
+        log_glaze(res);
+    };
 }

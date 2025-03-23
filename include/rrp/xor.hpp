@@ -1,7 +1,11 @@
 //https://wyliemaster.github.io/gddocs/#/topics/encryption/xor
+#pragma once
 
 #include <string_view>
 #include <string>
+#include "reflect"
+#include <iostream>
+
 
 namespace rrp
 {
@@ -28,5 +32,18 @@ inline std::string xor_cycle(std::string input, std::string_view key) {
 	}
 	return input;
 }
+
+template<typename T, reflect::fixed_string KEY>
+struct XorWrapper
+{
+    static T parse(std::string_view str)
+    {
+        std::cout << "input: " << str << "\n";
+        auto x = xor_cycle(str, KEY);
+        std::cout << "output: " <<  x << '\n';
+        return T:: template parse<T>(x);
+    }
+};
+
 
 }

@@ -51,7 +51,7 @@ struct LevelObject : public rrp::ValueMapContainer
     // String getters
     RRP_IVM_W_GETTER(std::string_view, 2, levelName);
 
-    RRP_IVM_W_GETTER(std::string_view, 3, description);
+    RRP_B64_IVM_W_GETTER(std::string_view, 3, description);
     RRP_IVM_W_GETTER(std::string_view, 4, levelString);
     RRP_IVM_W_GETTER(std::string_view, 26, recordString); // Note: Unused
     RRP_IVM_W_GETTER(std::string_view, 28, uploadDate);

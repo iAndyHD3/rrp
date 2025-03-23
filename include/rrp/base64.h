@@ -54,16 +54,21 @@ inline std::string decode(std::string_view in) {
 }
 
 
-template<typename T, int index> requires(std::is_same_v<T, std::string_view>)
-struct IndexedBase64String : ::rrp::IndexedValueMap<T, index>
+
+template<typename T>
+struct Base64Wrapper
 {
-    std::string decode()
+    static T parse(std::string_view str)
     {
-        return ::rrp::base64::decode(this->value); 
+        return T:: template parse<T>(decode(str));
     }
 };
 
+
 #define RRP_B64S_IVM_W_GETTER(T, index, name) \
-  RRP_IVM_W_GETTER(T, index, name) \
-  std::string name##_decoded() { return ::rrp::base64::decode(m_##name.value); }
+  ::rrp::IndexedValueMap<T, index> m_##name; \
+  T name() { return m_##name.value; } \
+  ::std::string name##_decoded() { return ::rrp::base64::decode(m_##name.value); }
+
+
 }

@@ -3,14 +3,10 @@
 
 #include "reflect"
 #include "rrp/rrp.hpp"
+#include "rrp/base64.h"
 #include <concepts>
 #include <string_view>
 #include <type_traits>
-
-#if !(__has_include(<matjson.hpp>))
-
-#error matjson not found
-#endif
 
 #include <matjson.hpp>
 #include <matjson/std.hpp>
@@ -44,19 +40,29 @@ matjson::Value write_json(R&& t)
    {
       auto globret = matjson::Value::object();
       std::vector<IndexedValueWIndexMember> orderVec;
-      reflect::for_each([&](auto I){
+      reflect::for_each([&](auto I)
+      {
          using M = std::remove_reference_t<decltype(reflect::get<I>(t))>;
          auto&& member = reflect::get<I>(t);
          auto&& name = reflect::member_name<I>(t);
-         if constexpr(std::is_convertible_v<decltype(M::value), matjson::Value>)
+
+         auto getValue = [&]()
          {
-            orderVec.emplace_back(IndexedValueWIndexMember{.value = member.value, .name = fix_key_name(name), .index = M::KEY});
-         }
-         else
-         {
-            orderVec.emplace_back(IndexedValueWIndexMember{.value = write_json(member), .name = fix_key_name(name), .index = M::KEY});
-         }
+            if constexpr(std::derived_from<M, IndexedValueBase64>)
+               return ::rrp::base64::decode(member.value);
+            else if constexpr(std::is_convertible_v<decltype(M::value), matjson::Value>)
+               return member.value;
+            else
+               return write_json(member.value);
+         };
+
+
+         orderVec.emplace_back(IndexedValueWIndexMember{
+            .value = getValue(),
+            .name = fix_key_name(name),
+            .index = M::KEY});
       }, t);
+
       std::sort(orderVec.begin(), orderVec.end(), [](const auto& l, const auto& r){ return l.index < r.index; });
       for(const auto& o : orderVec)
       {

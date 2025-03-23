@@ -6,14 +6,15 @@
 #include "reflect"
 #include "fast_float.h"
 #include "fromString.hpp"
+#include <iostream>
 
 namespace rrp
 {
 
-//inline void myprint(auto a, std::source_location x = std::source_location::current())
-//{
-//    std::cout << a << " | " << x.file_name() << ":" << x.line() << '\n';
-//}
+inline void myprint(auto a, std::source_location x = std::source_location::current())
+{
+    std::cout << a << " | " << x.file_name() << ":" << x.line() << '\n';
+}
 
 template<typename T>
 concept Parsable = requires(T t, std::string_view str) {
@@ -21,16 +22,26 @@ concept Parsable = requires(T t, std::string_view str) {
     { T::template parse<T>(str) } -> std::same_as<T>;
 };
 
-
+template<typename T>
+struct OptionalWrapper
+{
+    std::optional<T> value;
+    static T parse(std::string_view str)
+    {
+        return fromString<T>(str);
+    }
+};
 
 std::vector<std::string_view> splitByDelimStringView(std::string_view str, std::string_view delim);
 std::unordered_map<int, std::string_view> splitByDelimToMap(std::string_view str, std::string_view delim);
 
 struct IndexedValueBase {};
 
+//this is to correctly serialize the value...
+struct IndexedValueBase64 {};
 
-template<typename T, int index>
-struct IndexedValueMap : IndexedValueBase
+template<typename T, int index, typename B = IndexedValueBase>
+struct IndexedValueMap : B
 {
     using type = T;
     T value{};
@@ -38,7 +49,7 @@ struct IndexedValueMap : IndexedValueBase
     constexpr static int KEY = index;
     static auto parse(std::string_view str)
     {
-        IndexedValueMap<T, index> ret;
+        IndexedValueMap<T, index, B> ret;
         if constexpr(Parsable<T>)
         {
             ret.value = T::template parse<T>(str);
@@ -48,6 +59,13 @@ struct IndexedValueMap : IndexedValueBase
     }
 };
 
+#define RRP_IVM_W_GETTER(T, index, name) \
+    rrp::IndexedValueMap<T, index> m_##name; \
+    T& name() { return m_##name.value; }
+
+#define RRP_B64_IVM_W_GETTER(T, index, name) \
+    rrp::IndexedValueMap<T, index, IndexedValueBase64> m_##name; \
+    T& name() { return m_##name.value; }
 
 
 
@@ -82,12 +100,6 @@ struct ValueMapContainer
         return ret;
     }
 };
-
-#define RRP_IVM_W_GETTER(T, index, name) \
-    rrp::IndexedValueMap<T, index> m_##name; \
-    T& name() { return m_##name.value; }
-
-
 
 // Define a concept that matches numerical types but excludes char
 template <typename T>
@@ -166,6 +178,7 @@ struct SimpleDelimSeparatedBase
     }
 };
 
+
 //expects `value` to be a member of parent
 struct SimpleIntResponseBase
 {
@@ -231,6 +244,17 @@ std::optional<T> rrp(std::string_view str)
         return ret;
     }
 }
+
+template<typename T, size_t N>
+struct SkipFirstN
+{
+    static T parse(std::string_view str)
+    {
+        myprint(str);
+        return T:: template parse<T>(str.substr(N));
+    }
+};
+
 
 #define RRP_IVM_DBC_W_GETTER(type, index, delim, name) \
     rrp::IndexedValueMap<rrp::DelimBasedContainer<type, delim>, index> m_##name; \
