@@ -116,10 +116,7 @@ concept has_non_empty_delim = requires {!T::DELIM.size() != 0;};
 
 #define RRP_DELIM(D) static constexpr reflect::fixed_string DELIM = D
 
-struct DelimBasedContainerBase
-{
-    static constexpr auto glaze_reflect = false;
-};
+struct DelimBasedContainerBase {};
 
 template<typename T, reflect::fixed_string D>
 struct DelimBasedContainer : DelimBasedContainerBase

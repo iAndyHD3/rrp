@@ -5,10 +5,9 @@
 namespace rrp::v22
 {
 
-struct getGJAccountComments20 : rrp::DelimBasedContainerBase
+struct getGJAccountComments20 : rrp::DelimBasedContainer<CommentObject, "|">
 {
-    RRP_DELIM("");
-    RRP_DBC_W_GETTER(CommentObject, "|", comments);
+    std::vector<CommentObject>& comments() { return values; }
 };
 
 
