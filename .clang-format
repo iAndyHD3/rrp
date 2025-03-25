@@ -4,5 +4,14 @@ AccessModifierOffset: '0'
 IndentWidth: '4'
 PointerAlignment: Left
 SortIncludes: 'false'
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: false
+  AfterStruct: false
+  AfterControlStatement: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterEnum: true
+AllowShortBlocksOnASingleLine: Empty
 
 ...

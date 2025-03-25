@@ -1,18 +1,7 @@
+#include "rrp/2.2/CommentObject.hpp"
+#include "rrp/2.2/endpoints/getGJAccountComments20.hpp"
 #include "rrp/rrp.hpp"
-#include <rrp/2.2/endpoints/getGJLevels21.hpp>
-#include <rrp/2.2/endpoints/getGJLevelLists.hpp>
-#include <rrp/2.2/endpoints/getGJGauntlets21.hpp>
-#include <rrp/2.2/endpoints/getGJUserInfo20.hpp>
-#include <rrp/2.2/endpoints/getGJDailyLevel.hpp>
-#include <rrp/2.2/endpoints/downloadGJLevel22.hpp>
-#include <rrp/2.2/endpoints/getGJRewards.hpp>
-#include <rrp/2.2/endpoints/getGJScores20.hpp>
-#include <rrp/2.2/endpoints/getGJMapPacks21.hpp>
-#include <rrp/2.2/endpoints/getGJAccountComments20.hpp>
-#include <rrp/2.2/endpoints/getGJComments21.hpp>
-#include <rrp/2.2/endpoints/getGJSongInfo.hpp>
-#include <rrp/2.2/endpoints/uploadGJLevel21.hpp>
-#include <rrp/2.2/endpoints/getGJMessages20.hpp>
+#include <rrp/2.2/endpoints/all.hpp>
 
 
 
@@ -45,7 +34,7 @@ int fileCount = 0;
 void log_glaze(const auto& response)
 {
 
-    std::cout << "Try matjson... ";
+    std::cout << "Logging Type: " << reflect::type_name<std::remove_reference_t<decltype(response)>>() << '\n';
 
     std::string buffer = write_json(response).dump();
     std::cout << buffer << "\n";
@@ -56,9 +45,10 @@ void log_glaze(const auto& response)
     std::cout << "SAVED TO: " << file.string() << std::endl;
     fileCount = fileCount + 1;
 }
-
+struct A {};
 int main()
 {
+    static_assert(reflect::size<A>() == 0);
 
     static_assert(!Parsable<rrp::v22::getGJLevels21>);
     static_assert(!Parsable<std::string>);
@@ -76,10 +66,8 @@ int main()
 
     "getGJLevels21.php"_test = [](){
         auto r = *rrp::rrp<rrp::v22::getGJLevels21>("1:10565740:2:Bloodbath:5:3:6:503085:8:10:9:50:10:90849443:12:0:13:21:14:4285711:17:1:43:6:25::18:10:19:10330:42:0:45:24746:3:V2hvc2UgYmxvb2Qgd2lsbCBiZSBzcGlsdCBpbiB0aGUgQmxvb2RiYXRoPyBXaG8gd2lsbCB0aGUgdmljdG9ycyBiZT8gSG93IG1hbnkgd2lsbCBzdXJ2aXZlPyBHb29kIGx1Y2suLi4=:15:3:30:7679228:31:0:37:0:38:0:39:0:46:1:47:2:35:467339|1:21761387:2:Bloodbath Z:5:1:6:3277407:8:10:9:20:10:10030910:12:0:13:20:14:334046:17:1:43:4:25::18:10:19:17840:42:0:45:0:3:UmVtYWtlIG9mIEJCLCBidXQgU2hvcnRlciBhbmQgbXVjaCBlYXNpZXIgWEQgTW9yZSBvZiBhIGdhbWVwbGF5IGxldmVsISAgSnVzdCBhIGZ1biBlYXN5IGRlbW9uLiBWZXJpZmllZCBCeSBYaW9kYXplciEgRW5qb3kgOkQ=:15:3:30:0:31:0:37:3:38:1:39:10:46:1:47:2:35:223469|1:64968478:2:Bloodbath but no:5:1:6:19747356:8:10:9:50:10:2778887:12:0:13:21:14:171471:17::43:6:25::18:8:19:24992:42:0:45:23233:3:Qmxvb2RiYXRoLCBJdCdzIG5vdCBldmVuIHRoaXM=:15:3:30:0:31:0:37:0:38:1:39:8:46:1:47:2:35:706340|1:75795864:2:Bloodbath:5:3:6:12348083:8:10:9:40:10:473190:12:0:13:22:14:14499:17::43:5:25::18:7:19:25025:42:0:45:55985:3:VGhhbmtzIHRvIGV2ZXJ5b25lIGluIG15IGRpc2NvcmQgc2VydmVyIHRoYXQgY29udHJpYnV0ZWQ=:15:3:30:75393195:31:0:37:0:38:1:39:6:46:1:47:2:35:513064#503085:Riot:37415|3277407:Zyzyx:88354|12348083:KNOEPPEL:3009121|19747356:Texic:6152129#1~|~223469~|~2~|~ParagonX9 - HyperioxX~|~3~|~31~|~4~|~ParagonX9~|~5~|~3.77~|~6~|~~|~10~|~http%3A%2F%2Faudio.ngfiles.com%2F223000%2F223469_ParagonX9___HyperioxX.mp3~|~7~|~~|~8~|~1~:~1~|~467339~|~2~|~At the Speed of Light~|~3~|~52~|~4~|~Dimrain47~|~5~|~9.56~|~6~|~~|~10~|~https%3A%2F%2Fgeometrydashcontent.b-cdn.net%2Fsongs%2F467339.mp3~|~7~|~~|~8~|~1~:~1~|~513064~|~2~|~EnV - Uprise~|~3~|~149~|~4~|~Envy~|~5~|~8.71~|~6~|~~|~10~|~http%3A%2F%2Faudio.ngfiles.com%2F513000%2F513064_EnV---Uprise.mp3~|~7~|~UCaRqE7rKwJl1BvMRU4FFVJQ~|~8~|~1~:~1~|~706340~|~2~|~-At the Speed of Light- (8 bit Remix)~|~3~|~46724~|~4~|~ThaPredator~|~5~|~4.78~|~6~|~~|~10~|~http%3A%2F%2Faudio.ngfiles.com%2F706000%2F706340_-At-the-Speed-of-Light--8-.mp3~|~7~|~~|~8~|~1#4:0:10#1664b8bb919b0822a4408752c37a9fb5f651f813");
-        log_glaze(r);
-        ////log_glaze(r);
 
-
+        //log_glaze(r);
         "bloodbath"_test = [&](){
             expect(r.levels()[0].levelID() == 10565740_i);
             expect(r.levels()[0].levelName() == "Bloodbath");
@@ -162,8 +150,10 @@ int main()
         expect(r.pageInfo.amount == 10_i);
     };
     "getGJGauntlets21.php"_test = [](){
+
+        
         auto r = *rrp::rrp<rrp::v22::getGJGauntlets21>("1:1:3:27732941,28200611,27483789,28225110,27448202|1:2:3:20635816,28151870,25969464,24302376,27399722|1:3:3:28179535,29094196,29071134,26317634,12107595|1:4:3:26949498,26095850,27973097,27694897,26070995|1:5:3:18533341,28794068,28127292,4243988,28677296|1:6:3:28255647,27929950,16437345,28270854,29394058|1:7:3:25886024,4259126,26897899,7485599,19862531|1:8:3:18025697,23189196,27786218,27728679,25706351|1:9:3:40638411,32614529,31037168,40937291,35165900|1:10:3:37188385,35280911,37187779,36301959,36792656|1:11:3:37269362,29416734,36997718,39853981,39853458|1:12:3:27873500,34194741,34851342,36500807,39749578|1:13:3:43908596,41736289,42843431,44063088,44131636|1:14:3:38427291,38514054,36966088,38398923,36745142|1:15:3:44121158,43923301,43537990,33244195,35418014|1:16:3:105693414,86517581,92149907,95484955,106517747|1:18:3:37925002,68048356,110772842,15619194,90809996|1:21:3:57871639,82135935,81764520,80044470,92971865|1:22:3:110679874,110398067,108372523,70511594,82977900|1:29:3:75243812,57953054,102341639,97472588,85257263|1:34:3:91380905,68790607,75603568,57066554,49941534|1:35:3:75101593,62995779,93878047,71496773,58964029|1:36:3:68265721,41092171,99230232,96419926,78878411|1:37:3:92555035,94887416,85219434,89465157,82357008|1:38:3:41429267,66057230,113410989,58968008,66001175|1:40:3:39113837,64896078,95819007,56026863,94266027|1:41:3:96732638,70680001,69487890,89886591,8660411|1:42:3:82261821,97102482,28165621,103877520,108627188|1:43:3:80218929,95436164,64302902,65044525,66960655|1:46:3:83313115,83325036,83302544,83325083,81451870|1:47:3:83294687,83323867,83320529,83315343,83324930|1:48:3:83323273,83025300,83296274,83256789,83323659|1:49:3:89521875,90475659,90117883,88266256,88775556|1:50:3:90459731,90475597,90471222,90251922,90475473#d096d273a40aa7e302764919bcdb76c8abaa8e21");
-        log_glaze(r);
+        //log_glaze(r);
 
         expect(r.gauntlets()[0].gauntletID() == Gauntlet::Fire);
         expect(r.gauntlets()[1].gauntletID() == Gauntlet::Ice);
@@ -184,7 +174,7 @@ int main()
 
     "getGJUserInfo20.php"_test = [](){
         auto r = *rrp::rrp<rrp::v22::getGJUserInfo20>("1:meluwudy:2:3935672:13:148:17:1068:10:12:11:15:51:10:3:9990:52:320:46:21504:4:476:8:1:18:0:19:0:50:0:20:UCZoN2WLAooS6uhREa9Cgpwg:21:82:22:17:23:113:24:83:25:85:26:24:28:1:43:2:48:2:53:26:54:3:30:29855:16:173831:31:0:44:logout:45:devexit:49:0:55:143,67,56,112,56,1,1,2,1,0,21,14:56:144,157,134,300,190,88,59,67:57:4,7,7,18,16,5,0:29:1");
-        //log_glaze(r);
+        log_glaze(r);
 
         expect(r.user.userName() == "meluwudy");
         expect(r.user.userID() == 3935672_i);
@@ -215,17 +205,14 @@ int main()
     };
 
     "downloadGJLevel22.php"_test = [](){
-        auto r = *rrp::rrp<rrp::v22::downloadGJLevel22>("1:128:2:1st level:3::4:H4sIAAAAAAAAC6WXUZLkIAiGL5StEgWV2qc5wxzAA8wV9vDbielEvumprtp9if3_AiIi0l-fpW8yNI08JNsoI5sNkTnkOUyyDkkpjTZkiO2fPtLoQ_7IOLRTfqst_6qt45dME_7SxC4zFd65kMeu-n829KX-Hr6nfnq3DfvRjfTeidtM_cHM9vUhZUv7YHOoc9Dt8Z2_22TOoe_DZ_ED5eM7DRwTH3p856ykOciWfssmW95yt61sYicsEqEGqCXCGqEHaPmCfYcWZ3uYrRJhXLe2AFuKMHrVbq8eE3nrhx_5CV0C3A804Iz5gnm9zdUdW4yYtBhQ6ZjvcWvZDRgHknAiSYEbDjABF-AaIl3EI84ZOPpXmDDMmCVlDn3FestJHwEt8_jyU79jvY71HOs51vMWsKYEjBxOS7r4QRwBqReWDGxPfOhL9E8L7BdckhJviWqMt6oBx4uiJsC4ohbzQWsChn8d8XLEywswLz1ufcrAuPcpxstEgBU4-mfFgGN8zCrw4l_ZiXYs-FhlL7NXNTq0NFkkSiOhJATE436AMBL5JhC8iRX4cqLi8td5-RX4drLOanAbOKtBuokZrnITTiLFfZ7Evc_T6HfCsMpKOIiz7BQQq4S9JJa9nKWJxOLYWawSiGVzs3ytRHspsdpoIOYzuagoQ6j1pcQ3GytRSTg2pzw5YwiNIZyv8ErwGM5nu0BlIWZBX2ycFX6RUEooJRolGiTmm79INOZYY46dbUKBykow-RvTsjGmnTHtjGlnCPsawryI-N3QxKLaUqwLTTKwAcei2rIAKzAaqsKOKhb9VipwbBqawj-Ffwr_0DQ1PGLNYtFvNQGz5UP8KuLX4J9jvw57jv163G_HI9fxyPXlkTt70NhF9hKb0q4a8XzFblx7xB32HE1uuuzt_jiaOEcT52jiHH2_l5gvrgk45ouj6XON8XOL8XP8OXCDfxX-4f-B15gv3hIw_GsxX7zFfPEO_66m9C_bF5V-dQ8AAA==:5:1:6:30144023:8:10:9:30:10:2864457:12:4:13:21:14:253052:17::43:0:25::18:0:19:0:42:0:45:208:15:2:30:128:31:0:28:11 years:29:7 years:35:0:36:0_46_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0:37:0:38:0:39:2:46::47::40::57::27:Aw==#30c4a15cfeb12f97de69d6bd0cc9478794e6c6c4#48e36e24b267df00a9c87aed127b4a9f020ac9c1");
-        //log_glaze(r);
+        auto r = *rrp::rrp<rrp::v22::downloadGJLevel22>("1:116370497:2:Stellar glow:3:QSBzb21ld2hhdCBpbnRlcmVzdGluZyBwbGF0Zm9ybWVyIGxldmVsLCBJIG1hZGUgaXQgYXMgZWFzeSBhbmQgY29tZm9ydGFibGUgYXMgcG9zc2libGUsIEkgaG9wZSB5b3UgbGlrZSBpdCBhbmQgaGFkIGZ1bi4=:4:level string would be here:5:5:6:14098234:8:10:9:40:10:25999:12:0:13:22:14:2962:17::43:5:25::18:6:19:25119:42:0:45:23116:15:5:30:0:31:0:28:3 days:29:2 days:35:10012658:36::37:3:38:1:39:5:46:113672:47:0:40:1:57:58970:27:Aw==:52:10001000,10001029,10001039,10012658:53:447,469,2157,4047,4396,6251,7672,7804,9692,13998,18776,20337,20608,21468#838cb68f85872c8715bd07b99b63d7971105cdb3#444658023c947e3c73e3ed4e496e0e2bc4d6c971##1~|~10001000~|~2~|~Potential~|~3~|~10001809~|~4~|~Sound Airyluvs~|~5~|~2.3~|~6~|~~|~10~|~~|~7~|~UCRPbLiW7UkdSjNBg7QL-OXA~|~8~|~0~:~1~|~10001029~|~2~|~Hide-and-Seek~|~3~|~10001809~|~4~|~Sound Airyluvs~|~5~|~1.82~|~6~|~~|~10~|~~|~7~|~UCRPbLiW7UkdSjNBg7QL-OXA~|~8~|~0~:~1~|~10001039~|~2~|~Hide-and-Seek instrumental~|~3~|~10001809~|~4~|~Sound Airyluvs~|~5~|~1.81~|~6~|~~|~10~|~~|~7~|~UCRPbLiW7UkdSjNBg7QL-OXA~|~8~|~0~:~1~|~10012658~|~2~|~Oort Loop~|~3~|~10001809~|~4~|~Sound Airyluvs~|~5~|~1.06~|~6~|~~|~10~|~~|~7~|~UCRPbLiW7UkdSjNBg7QL-OXA~|~8~|~0#");
+        log_glaze(r);
         
-        expect(r.level.levelID() == 128_i);
-        expect(r.level.levelString() == "H4sIAAAAAAAAC6WXUZLkIAiGL5StEgWV2qc5wxzAA8wV9vDbielEvumprtp9if3_AiIi0l-fpW8yNI08JNsoI5sNkTnkOUyyDkkpjTZkiO2fPtLoQ_7IOLRTfqst_6qt45dME_7SxC4zFd65kMeu-n829KX-Hr6nfnq3DfvRjfTeidtM_cHM9vUhZUv7YHOoc9Dt8Z2_22TOoe_DZ_ED5eM7DRwTH3p856ykOciWfssmW95yt61sYicsEqEGqCXCGqEHaPmCfYcWZ3uYrRJhXLe2AFuKMHrVbq8eE3nrhx_5CV0C3A804Iz5gnm9zdUdW4yYtBhQ6ZjvcWvZDRgHknAiSYEbDjABF-AaIl3EI84ZOPpXmDDMmCVlDn3FestJHwEt8_jyU79jvY71HOs51vMWsKYEjBxOS7r4QRwBqReWDGxPfOhL9E8L7BdckhJviWqMt6oBx4uiJsC4ohbzQWsChn8d8XLEywswLz1ufcrAuPcpxstEgBU4-mfFgGN8zCrw4l_ZiXYs-FhlL7NXNTq0NFkkSiOhJATE436AMBL5JhC8iRX4cqLi8td5-RX4drLOanAbOKtBuokZrnITTiLFfZ7Evc_T6HfCsMpKOIiz7BQQq4S9JJa9nKWJxOLYWawSiGVzs3ytRHspsdpoIOYzuagoQ6j1pcQ3GytRSTg2pzw5YwiNIZyv8ErwGM5nu0BlIWZBX2ycFX6RUEooJRolGiTmm79INOZYY46dbUKBykow-RvTsjGmnTHtjGlnCPsawryI-N3QxKLaUqwLTTKwAcei2rIAKzAaqsKOKhb9VipwbBqawj-Ffwr_0DQ1PGLNYtFvNQGz5UP8KuLX4J9jvw57jv163G_HI9fxyPXlkTt70NhF9hKb0q4a8XzFblx7xB32HE1uuuzt_jiaOEcT52jiHH2_l5gvrgk45ouj6XON8XOL8XP8OXCDfxX-4f-B15gv3hIw_GsxX7zFfPEO_66m9C_bF5V-dQ8AAA==");
-        expect(r.hash1 == "30c4a15cfeb12f97de69d6bd0cc9478794e6c6c4");
-        expect(r.hash2 == "48e36e24b267df00a9c87aed127b4a9f020ac9c1");
+        expect(r.level.levelID() == 116370497_i);
     };
     "getGJRewards.php"_test = [](){
         auto r = *rrp::rrp<v22::getGJRewards>("rEwZGeWpJfEMPDQUOAgIPAQIKBg4DCAAPX1deVFNfV14fDQFSDR9UWAdcH1NfV14fU19XXlFRDgMJBwRbCwkEDQEJDQIPCQsMAhkNHQgeBQMADgsBAwECAAAJHQkAGQgdCAgADwcCAg==|745d883ead4fc5888e3b7cac1fbfcdc72a85e2d5");
-        log_glaze(r);
+        //log_glaze(r);
 
         //LSxDq:4460760:837202:ffffffff-88c5-aa6d-ffff-ffffcd72151b:1688850:0:40,4,0,0:1694:0:250,12,1,0:566:0 | C:/Users/User/Desktop/projects/cpp/rrp/include\rrp/2.2/getGJRewards.hpp:40
         expect(r.data.randomString == "LSxDq");
@@ -257,30 +244,35 @@ int main()
     };
 
     "getGJAccountComments"_test = [](){
+        
         auto r = *rrp::rrp<v22::getGJAccountComments20>("2~T2ggOGsgc3RhcnMgbmljZQ==~4~47~9~2 years~6~1808699|2~NzUwMCBzdGFycyBjOg==~4~10~9~2 years~6~1803945|2~SSBiZWF0IDYgaW5zYW5lIGRlbW9ucyBpbiAyNCBob3VycyBsbWFvOiBOZWNyb3BvbGlzLCBUaGUgQ2F2ZXJucyBJSSwgRWxlbWVudHMgWCwgWCBBZHZlbnR1cmUsIFNhZGlzbSwgYW5kIEJsYXN0ZXIgYzo=~4~23~9~3 years~6~1793260|2~L1wvXC9cIDwz~4~8~9~3 years~6~1785414|2~U2VudCBmcm9tIGlPUyBTaG9ydGN1dHMh~4~11~9~4 years~6~1776426|2~VGhpcyBjb21tZW50IHdhcyB1cGxvYWRlZCBmb3IgdGhlIEdEIERvY3Mh~4~7~9~4 years~6~1772719|2~VGhlIHRyaWxvZ3kgaGFzIGJlZW4gY29tcGxldGVkLi4uR0cgQWZ0ZXJtYXRoIQ==~4~8~9~4 years~6~1766450|2~Im93byIgLSBGb3VuZG15YmFsbA==~4~4~9~4 years~6~1766338|2~NTAwMCBzdGFycyE=~4~12~9~4 years~6~1756926|2~Qmxvb2RiYXRoIEdHISEh~4~25~9~5 years~6~1745624#74:0:10");
         expect(r.comments()[0].likes() == 47_i);
         expect(r.comments()[0].age() == "2 years");
         expect(r.comments()[0].messageID() == 1808699_i);
-        expect(r.comments()[0].comment_decoded() == "Oh 8k stars nice");
+        expect(r.comments()[0].comment() == "Oh 8k stars nice");
 
         expect(r.comments()[1].likes() == 10_i);
         expect(r.comments()[1].messageID() == 1803945_i);
 
-        log_glaze(r);
+        
+        
+        //log_glaze(r);
     };
 
     "getGJComments"_test = [](){
         auto r = *rrp::rrp<v22::getGJComments21>("2~NzQgYXR0IHdoYXR0~3~210153877~4~0~7~0~10~4~9~15 minutes~6~46232563:1~dooblom~9~91~10~19~11~11~14~2~15~2~16~23631435|2~QUFBQUFBQUFBQQ==~3~267641474~4~0~7~0~10~37~9~17 minutes~6~46232555:1~CaAlexDa~9~26~10~12~11~2~14~0~15~2~16~19216511|2~SSBzaG91bGQgc3RhcnQgZ3JpbmRpbmcgY2hhbGxlbmdlcyEh~3~263506358~4~0~7~0~10~100~9~31 minutes~6~46232489:1~0bv~9~35~10~3~11~12~14~0~15~0~16~30775227|2~MTk1NiBhdHRlbXB0cyBpbiBwcmFjdGljZSBGSU5BTExZIQ==~3~245747440~4~0~7~0~10~0~9~1 hour~6~46232231:1~artistboylo~9~9~10~6~11~16~14~7~15~2~16~28706271|2~Ui5JLlAgQm8g~3~268611032~4~-2~7~0~10~100~9~5 hours~6~46231318:1~xStixGDx~9~11~10~12~11~12~14~6~15~0~16~31063613|2~bG1hbw==~3~147836572~4~1~7~0~10~5~9~8 hours~6~46231019:1~NGDK~9~1~10~1~11~12~14~6~15~0~16~15162356|2~NzQzIGF0dCBpbiBwcmFjdGljZSx3dw==~3~263745181~4~1~7~0~10~0~9~9 hours~6~46230852:1~eskibime~9~37~10~18~11~12~14~5~15~0~16~30290292|2~d3Rm~3~267359964~4~1~7~0~10~11~9~9 hours~6~46230775:1~knoxoniaa~9~58~10~102~11~12~14~0~15~2~16~30998487|2~W3ZdZXJ0aWNhbCBbc11wZWVkIFtjXW9uc2VydmF0aW9uIGlzIGEgc3VwZXIgbWFyaW8gNjQgc3BlZWRydW5uaW5nIHN0cmF0ZWd5Lg==~3~268138873~4~1~7~0~10~0~9~9 hours~6~46230770:1~ultrabucket~9~108~10~15~11~23~14~0~15~2~16~31054190|2~R0cgMTQgYXR0LiAoSSB3b250IHNob3cgbXkgcGVyY2VudGFnZSBqdXN0IHRydXN0IG1lIG9uIHRoaXMgb25lKQ==~3~116404059~4~1~7~0~10~0~9~10 hours~6~46230718:1~themuffinthief~9~6~10~12~11~9~14~2~15~2~16~18175167#46173:0:10");
-        expect(r.comments()[0].comment.comment() == "NzQgYXR0IHdoYXR0");
+        expect(r.comments()[0].comment.comment() == "74 att whatt");
         expect(r.comments()[0].comment.authorAccountID() == 210153877_i);
         expect(r.comments()[0].user.userName() == "dooblom");
         expect(r.comments()[0].user.iconID() == 91_i);
-        expect(r.comments()[0].comment.comment_decoded() == "74 att whatt");
+        expect(r.comments()[0].comment.comment() == "74 att whatt");
 
-        expect(r.comments()[1].comment.comment() == "QUFBQUFBQUFBQQ==");
+        expect(r.comments()[1].comment.comment() == "AAAAAAAAAA");
         expect(r.comments()[1].comment.authorAccountID() == 267641474_i);
         expect(r.comments()[1].user.userName() == "CaAlexDa");
         expect(r.comments()[1].user.iconID() == 26_i);
+
+        //log_glaze(r);
     };
     
     "getGJSongInfo"_test = [](){
@@ -324,11 +316,24 @@ int main()
     "getGJMessages20"_test = [](){
         auto res = *rrp::rrp<getGJMessages20>("6:RayDeeUx:3:10709102:2:1941705:1:89220349:4:YXNkZg==:8:1:9:0:7:1 month|6:RayDeeUx:3:10709102:2:1941705:1:89220347:4:Zm9vYmFy:8:1:9:0:7:1 month|6:RayDeeUx:3:10709102:2:1941705:1:89220346:4:Zm9vYmFy:8:1:9:0:7:1 month|6:RayDeeUx:3:10709102:2:1941705:1:89220345:4:cGlwZWJvbWI=:8:1:9:0:7:25 minutes|6:RayDeeUx:3:10709102:2:1941705:1:89220337:4:Zm9vYmFy:8:1:9:0:7:25 minutes|6:GDAuth:3:162487010:2:16821094:1:89220288:4:aGk=:8:1:9:0:7:1 month#0:0:50");
         
-        expect(res.messages()[0].title_decoded() == "asdf");
+        expect(res.messages()[0].title() == "asdf");
         expect(res.messages()[0].age() == "1 month");
         expect(res.messages()[0].userName() == "RayDeeUx");
 
-        log_glaze(res);
+        //log_glaze(res);
+    };
+
+    "downloadGJMessage20"_test = [](){
+        auto res = rrp::rrp<downloadGJMessage20>("6:RayDeeUx:3:10709102:2:1941705:1:89220349:4:YXNkZg==:8:1:9:0:5:V1tdV1BD:7:1 month");
+        
+        expect(res.has_value());
+
+        expect(res->message.messageID() == 89220349_i);
+        expect(res->message.accountID() == 1941705_i);
+        expect(res->message.title() == "asdf");
+        expect(res->message.messageContent() == "foobar");
+        //log_glaze(*res);
+
     };
 
     std::cout << "type" << reflect::type_name<getGJLevels21>();

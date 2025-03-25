@@ -9,5 +9,5 @@ struct getGJUserInfo20
     RRP_DELIM("");
     rrp::v22::UserObject user;
 };
-
+    
 }

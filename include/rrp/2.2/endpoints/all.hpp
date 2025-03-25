@@ -1,4 +1,5 @@
 #include "downloadGJLevel22.hpp"
+#include "downloadGJMessage20.hpp"
 #include "getGJAccountComments20.hpp"
 #include "getGJComments21.hpp"
 #include "getGJDailyLevel.hpp"
@@ -23,6 +24,7 @@ template<typename F>
 constexpr inline void forAllRequestTypes(F&& f)
 {
     f.template operator()<downloadGJLevel22>();
+    f.template operator()<downloadGJMessage20>();
     f.template operator()<getGJAccountComments20>();
     f.template operator()<getGJComments21>();
     f.template operator()<getGJDailyLevel>();

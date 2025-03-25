@@ -32,24 +32,22 @@ inline std::string fix_key_name(std::string_view name)
     {
         return std::string(name);
     }
-    else if(name == "m_auto_")
+    else if (name == "m_auto_")
     {
         return "auto";
     }
     return std::string(name.substr(2));
 }
 
-template <typename T, typename = void> struct is_container : std::false_type
-{
-};
 
-template <typename T>
-struct is_container<T, std::void_t<decltype(std::declval<T>().emplace_back(std::declval<typename T::value_type>()))>>
-    : std::true_type
+template<typename T> requires std::is_enum_v<T>
+matjson::Value write_json(T& t)
 {
-};
+    return matjson::Value(std::to_underlying(t));
+}
 
-template <typename R> matjson::Value write_json(R&& t)
+template <typename R> requires std::is_aggregate_v<R>
+matjson::Value write_json(R& t)
 {
     using T = std::remove_reference_t<R>;
 
@@ -70,8 +68,12 @@ template <typename R> matjson::Value write_json(R&& t)
                 auto getValue = [&]() {
                     if constexpr (std::derived_from<M, IndexedValueBase64>)
                         return ::rrp::base64::decode(member.value);
+                    else if constexpr(std::derived_from<M, IndexedValueXoredBase64Base>)
+                        return xor_cycle(::rrp::base64::decode(member.value), M::XOR_KEY);
                     else if constexpr (std::is_convertible_v<decltype(M::value), matjson::Value>)
                         return member.value;
+                    //else if constexpr (std::derived_from<M, IndexedValueXorBase>)
+                    //    return xor_cycle(member.value, M::XOR_KEY);
                     else
                         return write_json(member.value);
                 };
@@ -138,5 +140,6 @@ template <typename R> matjson::Value write_json(R&& t)
         return ret;
     }
 }
+
 
 } // namespace rrp

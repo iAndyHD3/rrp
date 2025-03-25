@@ -13,7 +13,7 @@ struct CommentObject : rrp::ValueMapContainer
     RRP_DELIM("~");
 
     RRP_IVM_W_GETTER(int32_t, 1, commentID)
-    RRP_B64S_IVM_W_GETTER(std::string_view, 2, comment)
+    RRP_B64_IVM_W_GETTER(std::string_view, 2, comment)
     RRP_IVM_W_GETTER(int32_t, 3, authorAccountID)
     RRP_IVM_W_GETTER(int32_t, 4, likes)
     RRP_IVM_W_GETTER(int32_t, 5, dislikes)

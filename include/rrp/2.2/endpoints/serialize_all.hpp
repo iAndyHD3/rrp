@@ -3,11 +3,14 @@
 #include "all.hpp"
 
 #include <rrp/rrp_serialize.hpp>
+#include "downloadGJMessage20.hpp"
 #include "enum.hpp"
 #include "rrp/2.2/endpoints/downloadGJLevel22.hpp"
 
 namespace rrp::v22
 {
+
+
 
 template<typename T>
 inline std::optional<std::string> json_from_response(std::string_view response, int dump = 4)
@@ -22,6 +25,7 @@ inline std::optional<std::string> rrp_json(std::string_view response, v22::Endpo
     switch (endpoint)
     {
         case Endpoint::DownloadGJLevel22: return json_from_response<downloadGJLevel22>(response);
+        case Endpoint::DownloadGJMessage20: return json_from_response<downloadGJMessage20>(response);
         case Endpoint::GetGJAccountComments20: return json_from_response<getGJAccountComments20>(response);
         case Endpoint::GetGJComments21: return json_from_response<getGJComments21>(response);
         case Endpoint::GetGJDailyLevel: return json_from_response<getGJDailyLevel>(response);
@@ -36,8 +40,8 @@ inline std::optional<std::string> rrp_json(std::string_view response, v22::Endpo
         case Endpoint::GetGJUserInfo20: return json_from_response<getGJUserInfo20>(response);
         case Endpoint::GetGJUsers20: return json_from_response<getGJUsers20>(response);
         case Endpoint::UploadGJLevel21: return json_from_response<uploadGJLevel21>(response);
-    }    
-
+        default: break;
+    }
     return {};
 }
 

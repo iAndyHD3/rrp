@@ -6,6 +6,7 @@ namespace rrp::v22
 
 enum class Endpoint {
     DownloadGJLevel22,
+    DownloadGJMessage20,
     GetGJAccountComments20,
     GetGJComments21,
     GetGJDailyLevel,

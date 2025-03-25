@@ -10,5 +10,4 @@ struct getGJAccountComments20 : rrp::DelimBasedContainer<CommentObject, "|">
     std::vector<CommentObject>& comments() { return values; }
 };
 
-
 }

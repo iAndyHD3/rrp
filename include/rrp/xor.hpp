@@ -3,9 +3,6 @@
 
 #include <string_view>
 #include <string>
-#include "reflect"
-#include <iostream>
-
 
 namespace rrp
 {
@@ -32,18 +29,18 @@ inline std::string xor_cycle(std::string input, std::string_view key) {
 	}
 	return input;
 }
-
-template<typename T, reflect::fixed_string KEY>
-struct XorWrapper
-{
-    static T parse(std::string_view str)
-    {
-        std::cout << "input: " << str << "\n";
-        auto x = xor_cycle(str, KEY);
-        std::cout << "output: " <<  x << '\n';
-        return T:: template parse<T>(x);
+/*
+#define RRP_XOR_IVM_W_GETTER(T, index, name, xor_key)                                                               \
+    ::rrp::IndexedValueMap<T, index, IndexedValueXoredBase64<xor_key, IndexedValueXorBase>> m_##name;                                                     \
+    std::string name()                                                                                                 \
+    {                                                                                                                  \
+        return xor_cycle(::rrp::base64::decode(m_##name.value), xor_key);                                                                  \
+    }                                                                                                                  \
+    T& name##_raw()                                                                                                    \
+    {                                                                                                                  \
+        return m_##name.value;                                                                                         \
     }
-};
 
+*/
 
 }
