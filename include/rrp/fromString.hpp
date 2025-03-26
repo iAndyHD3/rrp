@@ -3,6 +3,7 @@
 #include <string_view>
 #include <optional>
 #include <type_traits>
+#include <utility>
 
 template<typename T>
 concept BasicTypeOrString = std::integral<T> || std::floating_point<T> || std::same_as<T, bool> || 
@@ -15,26 +16,26 @@ std::optional<T> fromString(std::string_view str)
     {
         if(auto val = fromString<std::underlying_type_t<T>>(str))
         {
-            return static_cast<T>(*val);
+            return std::optional<T>(std::in_place, static_cast<T>(*val));
         }
     }
     else if constexpr (std::is_same_v<T, std::string>)
     {
-        return std::string(str);
+        return std::optional<std::string>(std::in_place, str);
     }
     else if constexpr (std::is_same_v<T, std::string_view>)
     {
-        return str;
+        return std::optional<T>(std::in_place, str);
     }
 
     else if constexpr (std::is_same_v<T, bool>)
 	{
-		return str == "1" || str == "true";
+		return std::optional<T>(std::in_place, str == "1" || str == "true");
 	}
     else
 	{
-		T value;
-		if (fast_float::from_chars(str.data(), str.data() + str.size(), value).ec == std::errc())
+        std::optional<T> value(std::in_place);
+		if (fast_float::from_chars(str.data(), str.data() + str.size(), *value).ec == std::errc())
 		{
 			return value;
 		}

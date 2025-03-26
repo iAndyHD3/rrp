@@ -24,6 +24,31 @@ struct UserBeatenDemons : public rrp::SimpleDelimSeparatedBase
 
 };
 
+struct UserBeatenClassicLevels : rrp::SimpleDelimSeparatedBase
+{
+    RRP_DELIM(",");
+    //{auto},{easy},{normal},{hard},{harder},{insane},{daily},{gauntlet}
+    std::uint32_t auto_;
+    std::uint32_t easy;
+    std::uint32_t normal;
+    std::uint32_t hard;
+    std::uint32_t harder;
+    std::uint32_t insane;
+    std::uint32_t daily;
+    std::uint32_t gauntlet;
+};
+struct UserBeatenPlatformerLevels : rrp::SimpleDelimSeparatedBase
+{
+    RRP_DELIM(",");
+    //{auto},{easy},{normal},{hard},{harder},{insane},{daily},{gauntlet}
+    std::uint32_t auto_;
+    std::uint32_t easy;
+    std::uint32_t normal;
+    std::uint32_t hard;
+    std::uint32_t harder;
+    std::uint32_t insane;
+};
+
 struct UserObject : ValueMapContainer
 {
     RRP_DELIM(":");
@@ -85,8 +110,8 @@ struct UserObject : ValueMapContainer
 
     RRP_IVM_W_GETTER(UserBeatenDemons, 55, beatenDemons)
 
-    RRP_IVM_W_GETTER(std::string_view, 56, classicLevels);
-    RRP_IVM_W_GETTER(std::string_view, 57, platformerLevels);
+    RRP_IVM_W_GETTER(UserBeatenClassicLevels, 56, classicLevels);
+    RRP_IVM_W_GETTER(UserBeatenPlatformerLevels, 57, platformerLevels);
 
 
 };

@@ -75,6 +75,7 @@ template <typename T, int index, typename B = IndexedValueBase> struct IndexedVa
     }
 
 
+
 struct ValueMapContainer {
     static constexpr auto glaze_reflect = false;
     template <typename T> static T parse(std::string_view str)
@@ -185,15 +186,16 @@ struct SimpleDelimSeparatedBase {
 };
 
 // expects `value` to be a member of parent
+template<typename T>
 struct SimpleIntResponseBase
 {
-    template <typename T> static T parse(std::string_view str)
+    int response;
+    static std::optional<T> parse(std::string_view str)
     {
-        T ret;
-        if (auto val = fromString<std::int32_t>(str); *val > 0)
-        {
-            ret.value.emplace(*val);
-        }
+        auto ret = std::optional<T>(std::in_place);
+        auto val = fromString<std::int32_t>(str);
+        if(!val) return {};
+        ret->response = *val;
         return ret;
     }
 };
@@ -204,6 +206,12 @@ template <typename T> struct has_treat_as_alias<T, std::void_t<typename T::treat
 
 template <typename T>
 concept HasTreatAs = has_treat_as_alias<T>::value;
+
+template<typename T>
+std::optional<T> rrp(std::string_view str) requires (std::derived_from<T, SimpleIntResponseBase<T>>)
+{
+    return SimpleIntResponseBase<T>::parse(str);
+}
 
 
 template <typename T> std::optional<T> rrp(std::string_view str)

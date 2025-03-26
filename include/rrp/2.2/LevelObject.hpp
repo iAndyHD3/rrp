@@ -44,7 +44,6 @@ struct LevelObject : public rrp::ValueMapContainer
     RRP_IVM_W_GETTER(std::uint8_t, 43, demonDifficulty)
 
 
-    // Bool getters
     RRP_IVM_W_GETTER(bool, 17, demon)
     RRP_IVM_W_GETTER(bool, 25, auto_)
     RRP_IVM_W_GETTER(bool, 31, twoPlayer)
@@ -52,23 +51,26 @@ struct LevelObject : public rrp::ValueMapContainer
     RRP_IVM_W_GETTER(bool, 40, lowDetailMode)
     RRP_IVM_W_GETTER(bool, 44, isGauntlet)
 
-    // String getters
     RRP_IVM_W_GETTER(std::string_view, 2, levelName)
 
     RRP_B64_IVM_W_GETTER(std::string_view, 3, description)
-    RRP_IVM_W_GETTER(std::string_view, 4, levelString)
-    RRP_IVM_W_GETTER(std::string_view, 26, recordString) // Note: Unused
+
+    //Only in download endpoint
+    RRP_IVM_W_GETTER(std::string_view, 4, levelString) 
+
+    // Note: Unused
+    RRP_IVM_W_GETTER(std::string_view, 26, recordString) 
+
     RRP_IVM_W_GETTER(std::string_view, 28, uploadDate)
     RRP_IVM_W_GETTER(std::string_view, 29, updateDate)
     RRP_IVM_W_GETTER(std::string_view, 36, extraString)
-    RRP_IVM_W_GETTER(std::string_view, 48, settingsString) // Note: Unused after early 2.1
 
-    // Encrypted String getters
+    // Note: Unused after early 2.1
+    RRP_IVM_W_GETTER(std::string_view, 48, settingsString) 
+
     RRP_B64_XOR_IVM_W_GETTER(std::string_view, 27, password, "26364")
 
-    // Comma-Separated List getters
     RRP_IVM_DBC_W_GETTER(int32_t, 52, ",", songIDs)
-    //RRP_IVM_W_GETTER(std::string_view, 52, songIDs)
     RRP_IVM_DBC_W_GETTER(int32_t, 53, ",", sfxIDs)
 
     //manual helpers

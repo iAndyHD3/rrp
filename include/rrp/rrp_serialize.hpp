@@ -28,15 +28,9 @@ namespace rrp
 
 inline std::string fix_key_name(std::string_view name)
 {
-    if (name.substr(0, 2) != "m_")
-    {
-        return std::string(name);
-    }
-    else if (name == "m_auto_")
-    {
-        return "auto";
-    }
-    return std::string(name.substr(2));
+    if(name.ends_with("auto_")) return "auto";
+    if(name.starts_with("m_")) return std::string(name.substr(2));
+    return std::string(name);
 }
 
 

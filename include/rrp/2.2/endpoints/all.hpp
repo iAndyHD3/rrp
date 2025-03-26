@@ -6,6 +6,7 @@
 #include "getGJGauntlets21.hpp"
 #include "getGJLevelLists.hpp"
 #include "getGJLevels21.hpp"
+#include "getGJLevelScores211.hpp"
 #include "getGJMapPacks21.hpp"
 #include "getGJMessages20.hpp"
 #include "getGJRewards.hpp"
@@ -13,8 +14,8 @@
 #include "getGJSongInfo.hpp"
 #include "getGJUserInfo20.hpp"
 #include "getGJUsers20.hpp"
-#include "uploadGJLevel21.hpp"
 
+#include "int_endpoints.hpp"
 
 namespace rrp::v22
 {
@@ -31,6 +32,7 @@ constexpr inline void forAllRequestTypes(F&& f)
     f.template operator()<getGJGauntlets21>();
     f.template operator()<getGJLevelLists>();
     f.template operator()<getGJLevels21>();
+    f.template operator()<getGJLevelScores211>();
     f.template operator()<getGJMapPacks21>();
     f.template operator()<getGJMessages20>();
     f.template operator()<getGJRewards>();
