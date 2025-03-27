@@ -40,7 +40,38 @@ constexpr inline void forAllRequestTypes(F&& f)
     f.template operator()<getGJSongInfo>();
     f.template operator()<getGJUserInfo20>();
     f.template operator()<getGJUsers20>();
+
+    //int responses
     f.template operator()<uploadGJLevel21>();
+    f.template operator()<uploadGJLevelList>();
+    f.template operator()<uploadGJComment21>();
+    f.template operator()<uploadGJAccComment20>();
+    f.template operator()<updateGJUserScore22>();
+    f.template operator()<rateGJStars211>();
+    f.template operator()<deleteGJLevelUser20>();
+    f.template operator()<suggestGJStars20>();
+    f.template operator()<rateGJDemon21>();
+    f.template operator()<uploadGJMessage20>();
+    f.template operator()<deleteGJMessages20>();
+    f.template operator()<deleteGJComment20>();
+    f.template operator()<deleteGJAccComment20>();
+    f.template operator()<deleteGJLevelList>();
+    f.template operator()<uploadFriendRequest20>();
+    f.template operator()<deleteGJFriendRequests20>();
+    f.template operator()<acceptGJFriendRequest20>();
+    f.template operator()<readGJFriendRequest20>();
+    f.template operator()<removeGJFriend20>();
+    f.template operator()<blockGJUser20>();
+    f.template operator()<unblockGJUser20>();
+    f.template operator()<updateGJDesc20>();
+    f.template operator()<likeGJItem211>();
+    f.template operator()<requestUserAccess>();
+    f.template operator()<reportGJLevel>();
+    f.template operator()<updateGJAccSettings20>();
+    
+    
+    //int endpoints
+
 }
 
 template<typename T>

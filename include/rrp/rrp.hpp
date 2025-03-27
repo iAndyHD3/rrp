@@ -17,6 +17,25 @@ inline void myprint(auto a, std::source_location x = std::source_location::curre
     std::cout << a << " | " << x.file_name() << ":" << x.line() << '\n';
 }
 
+// Define a concept that matches numerical types but excludes char
+template <typename T>
+concept is_numerical_generic = std::is_arithmetic_v<T> && !std::is_same_v<T, char>;
+
+template <typename T>
+concept HasNonEmptyDelim = requires {
+    { T::DELIM } -> std::convertible_to<std::string_view>;
+} && (T::DELIM.size() > 0);
+
+
+#define RRP_DBC_W_GETTER(T, delim, name)                                                                               \
+    rrp::DelimBasedContainer<T, delim> m_##name;                                                                       \
+    std::vector<T>& name()                                                                                             \
+    {                                                                                                                  \
+        return m_##name.values;                                                                                        \
+    }
+
+#define RRP_DELIM(D) static constexpr reflect::fixed_string DELIM = D
+
 template <typename T>
 concept Parsable = requires(T t, std::string_view str) {
     // Check if T::parse<T>(str) is valid where parse returns T
@@ -29,7 +48,6 @@ template <typename T, typename B> struct AddTop : B {
 
 template <typename T> struct TreatAs : T {
     using treat_as = T;
-
 };
 
 std::vector<std::string_view> splitByDelimStringView(std::string_view str, std::string_view delim);
@@ -44,9 +62,12 @@ struct IndexedValueXorBase {};
 
 struct IndexedValueXoredBase64Base {};
 
-template<reflect::fixed_string KEY, typename B>
-struct IndexedValueXored : B {
+template <reflect::fixed_string KEY, typename B> struct IndexedValueXored : B {
     static constexpr auto XOR_KEY = KEY;
+};
+
+struct A {
+    RRP_DELIM("");
 };
 
 template <typename T, int index, typename B = IndexedValueBase> struct IndexedValueMap : B {
@@ -74,14 +95,12 @@ template <typename T, int index, typename B = IndexedValueBase> struct IndexedVa
         return m_##name.value;                                                                                         \
     }
 
-
-
 struct ValueMapContainer {
     static constexpr auto glaze_reflect = false;
     template <typename T> static T parse(std::string_view str)
     {
-        // myprint("\n");
-        // myprint(str);
+        static_assert(HasNonEmptyDelim<T>, "Delimiter is needed for ValueMapContainer");
+
         T ret;
         auto tokens = splitByDelimToMap(str, T::DELIM);
         // myprint(tokens.size());
@@ -107,22 +126,6 @@ struct ValueMapContainer {
         return ret;
     }
 };
-
-// Define a concept that matches numerical types but excludes char
-template <typename T>
-concept is_numerical_generic = std::is_arithmetic_v<T> && !std::is_same_v<T, char>;
-
-template <typename T>
-concept has_non_empty_delim = requires { !T::DELIM.size() != 0; };
-
-#define RRP_DBC_W_GETTER(T, delim, name)                                                                               \
-    rrp::DelimBasedContainer<T, delim> m_##name;                                                                       \
-    std::vector<T>& name()                                                                                             \
-    {                                                                                                                  \
-        return m_##name.values;                                                                                        \
-    }
-
-#define RRP_DELIM(D) static constexpr reflect::fixed_string DELIM = D
 
 struct DelimBasedContainerBase {};
 
@@ -158,7 +161,6 @@ template <typename T, reflect::fixed_string D> struct DelimBasedContainer : Deli
     }
 };
 
-
 struct SimpleDelimSeparatedBase {
     static constexpr auto glaze_reflect = false;
 
@@ -186,15 +188,14 @@ struct SimpleDelimSeparatedBase {
 };
 
 // expects `value` to be a member of parent
-template<typename T>
-struct SimpleIntResponseBase
-{
+template <typename T> struct SimpleIntResponseBase {
     int response;
     static std::optional<T> parse(std::string_view str)
     {
         auto ret = std::optional<T>(std::in_place);
         auto val = fromString<std::int32_t>(str);
-        if(!val) return {};
+        if (!val)
+            return {};
         ret->response = *val;
         return ret;
     }
@@ -207,12 +208,12 @@ template <typename T> struct has_treat_as_alias<T, std::void_t<typename T::treat
 template <typename T>
 concept HasTreatAs = has_treat_as_alias<T>::value;
 
-template<typename T>
-std::optional<T> rrp(std::string_view str) requires (std::derived_from<T, SimpleIntResponseBase<T>>)
+template <typename T>
+std::optional<T> rrp(std::string_view str)
+    requires(std::derived_from<T, SimpleIntResponseBase<T>>)
 {
     return SimpleIntResponseBase<T>::parse(str);
 }
-
 
 template <typename T> std::optional<T> rrp(std::string_view str)
 {
@@ -265,7 +266,6 @@ template <typename T> std::optional<T> rrp(std::string_view str)
         return ret;
     }
 }
-
 
 #define RRP_IVM_DBC_W_GETTER(type, index, delim, name)                                                                 \
     rrp::IndexedValueMap<rrp::DelimBasedContainer<type, delim>, index> m_##name;                                       \

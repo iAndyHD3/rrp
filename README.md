@@ -33,43 +33,17 @@ Be careful to only access std::string_view members while the original response s
 
 Missing endpoints:
 
-- rateGJStars211.hpp
-- deleteGJLevelUser20.hpp
-- suggestGJStars20.hpp
-- rateGJDemon21.hpp
 - getGJLevelScoresPlat.hpp
 - getGJTopArtists.hpp
-- uploadGJMessage20.hpp
-- deleteGJMessages20.hpp
 - getGJCommentHistory.hpp
-- uploadGJComment21.hpp
-- uploadGJAccComment20.hpp
-- deleteGJComment20.hpp
-- deleteGJAccComment20.hpp
 - getGJFriendRequests20.hpp
-- uploadFriendRequest20.hpp
-- deleteGJFriendRequests20.hpp
-- acceptGJFriendRequest20.hpp
-- readGJFriendRequest20.hpp
-- removeGJFriend20.hpp
-- blockGJUser20.hpp
-- unblockGJUser20.hpp
 - getGJUserList20.hpp
-- updateGJDesc20.hpp
-- likeGJItem211.hpp
-- requestUserAccess.hpp
 - getGJSecretReward.hpp
 - getGJChallenges.hpp
-- restoreGJItems.hpp
-- reportGJLevel.hpp
-- submitGJUserInfo.hpp
-- uploadGJLevelList.hpp
-- deleteGJLevelList.hpp
-- updateGJUserScore22.hpp
-- getCustomContentURL.hpp
 - registerGJAccount.hpp
-- loginGJAccount.hpp
+
+- loginGJAccount.hpp (needs custom parse)
+
 - getAccountURL.hpp
 - backupGJAccountNew.hpp
 - syncGJAccountNew.hpp
-- updateGJAccSettings20.hpp
