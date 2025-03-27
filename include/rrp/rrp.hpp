@@ -24,7 +24,7 @@ concept is_numerical_generic = std::is_arithmetic_v<T> && !std::is_same_v<T, cha
 template <typename T>
 concept HasNonEmptyDelim = requires {
     { T::DELIM } -> std::convertible_to<std::string_view>;
-} && (T::DELIM.size() > 0);
+} && (T::DELIM.size() != 0);
 
 
 #define RRP_DBC_W_GETTER(T, delim, name)                                                                               \
@@ -99,10 +99,11 @@ struct ValueMapContainer {
     static constexpr auto glaze_reflect = false;
     template <typename T> static T parse(std::string_view str)
     {
-        static_assert(HasNonEmptyDelim<T>, "Delimiter is needed for ValueMapContainer");
+        static_assert(HasNonEmptyDelim<T>, "Add a delimiter");
 
         T ret;
         auto tokens = splitByDelimToMap(str, T::DELIM);
+        if(tokens.empty()) return ret;
         // myprint(tokens.size());
         // if constexpr(T::DELIM == "~|~")
         //{
@@ -145,6 +146,7 @@ template <typename T, reflect::fixed_string D> struct DelimBasedContainer : Deli
 
         U ret;
         auto tokens = splitByDelimStringView(str, U::DELIM);
+        if(tokens.empty()) return ret;
         if constexpr (Parsable<T>)
         {
             for (const auto& t : tokens)
@@ -168,6 +170,7 @@ struct SimpleDelimSeparatedBase {
     {
         T ret;
         auto tokens = splitByDelimStringView(str, T::DELIM);
+        if(tokens.empty()) return ret;
         reflect::for_each(
             [&](auto I) {
                 auto&& member = reflect::get<I>(ret);
